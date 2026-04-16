@@ -1,0 +1,884 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+
+// ═══════════════════════════════════════════════════════════════
+//  🔥 FIREBASE CONFIG — Replace with YOUR Firebase project values
+//  Steps: firebase.google.com → New Project → Realtime Database
+// ═══════════════════════════════════════════════════════════════
+const FIREBASE_URL = "https://vacation-course-default-rtdb.firebaseio.com";
+// ✅ Connected to: vacation-course Firebase project
+
+// ─── Firebase REST helpers ───────────────────────────────────────
+const fb = {
+  async get(path) {
+    try {
+      const r = await fetch(`${FIREBASE_URL}/${path}.json`);
+      return r.ok ? await r.json() : null;
+    } catch { return null; }
+  },
+  async set(path, data) {
+    try {
+      await fetch(`${FIREBASE_URL}/${path}.json`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch (e) { console.error("Firebase set error", e); }
+  },
+  async patch(path, data) {
+    try {
+      await fetch(`${FIREBASE_URL}/${path}.json`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch (e) { console.error("Firebase patch error", e); }
+  },
+  async del(path) {
+    try {
+      await fetch(`${FIREBASE_URL}/${path}.json`, { method: "DELETE" });
+    } catch (e) { console.error("Firebase delete error", e); }
+  },
+};
+
+// ─── Constants ───────────────────────────────────────────────────
+const DAYS = Array.from({ length: 30 }, (_, i) => i + 1);
+const WEEKS = [
+  { label: "Week 1", days: [1,2,3,4,5,6,7] },
+  { label: "Week 2", days: [8,9,10,11,12,13,14] },
+  { label: "Week 3", days: [15,16,17,18,19,20,21] },
+  { label: "Week 4", days: [22,23,24,25,26,27,28] },
+  { label: "Week 5", days: [29,30] },
+];
+const S_NEXT = { "": "P", P: "A", A: "L", L: "P" };
+const S_LABEL = { P: "Present", A: "Absent", L: "Leave", "": "—" };
+const S_COLOR = {
+  P:  { bg: "#16a34a", text: "#fff", light: "#dcfce7" },
+  A:  { bg: "#dc2626", text: "#fff", light: "#fee2e2" },
+  L:  { bg: "#d97706", text: "#fff", light: "#fef3c7" },
+  "": { bg: "#1e293b", text: "#475569", light: "#f1f5f9" },
+};
+const TABS = [
+  { id: "attendance", icon: "📋", label: "Attendance" },
+  { id: "students",   icon: "👥", label: "Students"   },
+  { id: "reports",    icon: "📊", label: "Reports"    },
+  { id: "analysis",   icon: "📈", label: "Analysis"   },
+  { id: "settings",   icon: "⚙️",  label: "Settings"   },
+];
+
+function waLink(phone, msg) {
+  const clean = phone.replace(/\D/g, "");
+  const num = clean.startsWith("92") ? clean : "92" + clean.replace(/^0/, "");
+  return `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// ─── Main App ────────────────────────────────────────────────────
+export default function VacationPro() {
+  // ── State
+  const [tab, setTab]             = useState("attendance");
+  const [students, setStudents]   = useState([]);
+  const [attendance, setAttendance] = useState({});
+  const [notes, setNotes]         = useState({});       // per-student notes
+  const [fees, setFees]           = useState({});       // per-student fee {paid, total}
+  const [settings, setSettings]   = useState({ courseName: "Vacation Course 2025", teacher: "Khan Sir", feeTotal: 3000, batch: "Morning" });
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [theme, setTheme]         = useState("dark");
+  const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | live | error
+  const [lastSync, setLastSync]   = useState(null);
+  const [toast, setToast]         = useState(null);
+  const [search, setSearch]       = useState("");
+  const [batchFilter, setBatchFilter] = useState("All");
+  const [modal, setModal]         = useState(null); // null | {type, data}
+  const [fbConfigured, setFbConfigured] = useState(true); // ✅ Firebase live
+  const syncTimer = useRef(null);
+  const isDark = theme === "dark";
+
+  // ── Colors
+  const c = {
+    bg:     isDark ? "#060d18" : "#f0f6ff",
+    card:   isDark ? "#0d1b2e" : "#ffffff",
+    card2:  isDark ? "#111f35" : "#f8faff",
+    border: isDark ? "#1a2d45" : "#dbeafe",
+    text:   isDark ? "#e2e8f0" : "#0f172a",
+    sub:    isDark ? "#4a6080" : "#64748b",
+    accent: "#2563eb",
+    green:  "#16a34a",
+    red:    "#dc2626",
+    amber:  "#d97706",
+    teal:   "#0891b2",
+  };
+
+  const showToast = (msg, type = "ok") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3200);
+  };
+
+  // ── Firebase: full pull
+  const pullFromFirebase = useCallback(async () => {
+    if (!fbConfigured) return;
+    setSyncStatus("syncing");
+    try {
+      const data = await fb.get("vacationpro");
+      if (data) {
+        if (data.students)   setStudents(Object.values(data.students));
+        if (data.attendance) setAttendance(data.attendance);
+        if (data.notes)      setNotes(data.notes);
+        if (data.fees)       setFees(data.fees);
+        if (data.settings)   setSettings(s => ({ ...s, ...data.settings }));
+      }
+      setSyncStatus("live");
+      setLastSync(new Date());
+    } catch {
+      setSyncStatus("error");
+    }
+  }, [fbConfigured]);
+
+  // ── Firebase: push students
+  const pushStudents = useCallback(async (list) => {
+    if (!fbConfigured) return;
+    const obj = {};
+    list.forEach(s => { obj[s.id] = s; });
+    await fb.set("vacationpro/students", obj);
+  }, [fbConfigured]);
+
+  const pushAttendance = useCallback(async (att) => {
+    if (!fbConfigured) return;
+    await fb.set("vacationpro/attendance", att);
+  }, [fbConfigured]);
+
+  const pushNotes = useCallback(async (n) => {
+    if (!fbConfigured) return;
+    await fb.set("vacationpro/notes", n);
+  }, [fbConfigured]);
+
+  const pushFees = useCallback(async (f) => {
+    if (!fbConfigured) return;
+    await fb.set("vacationpro/fees", f);
+  }, [fbConfigured]);
+
+  const pushSettings = useCallback(async (s) => {
+    if (!fbConfigured) return;
+    await fb.patch("vacationpro/settings", s);
+  }, [fbConfigured]);
+
+  // ── Heartbeat sync every 8s
+  useEffect(() => {
+    if (!fbConfigured) return;
+    pullFromFirebase();
+    syncTimer.current = setInterval(pullFromFirebase, 8000);
+    return () => clearInterval(syncTimer.current);
+  }, [fbConfigured, pullFromFirebase]);
+
+  // ── Stats helper
+  const getStats = useCallback((sid) => {
+    const att = attendance[sid] || {};
+    let p=0,a=0,l=0;
+    Object.values(att).forEach(v => { if(v==="P")p++; else if(v==="A")a++; else if(v==="L")l++; });
+    const total=p+a+l;
+    return { p, a, l, total, pct: total ? Math.round(p/total*100) : 0 };
+  }, [attendance]);
+
+  // ── Toggle attendance
+  const toggleAtt = async (sid, day) => {
+    const cur = attendance[sid]?.[day] || "";
+    const next = S_NEXT[cur];
+    const updated = { ...attendance, [sid]: { ...(attendance[sid]||{}), [day]: next } };
+    setAttendance(updated);
+    setSyncStatus("syncing");
+    await pushAttendance(updated);
+    setSyncStatus("live");
+    setLastSync(new Date());
+  };
+
+  // ── Mark all for a day
+  const markAll = async (status) => {
+    const updated = { ...attendance };
+    students.forEach(s => {
+      updated[s.id] = { ...(updated[s.id]||{}), [selectedDay]: status };
+    });
+    setAttendance(updated);
+    await pushAttendance(updated);
+    showToast(`All marked ${S_LABEL[status]} — Day ${selectedDay}`);
+  };
+
+  // ── Add student
+  const addStudent = async (form) => {
+    const ns = { id: uid(), name: form.name.trim(), father: form.father.trim(), phone: form.phone.trim(), batch: form.batch, joinedDay: selectedDay };
+    const list = [...students, ns];
+    setStudents(list);
+    await pushStudents(list);
+    setModal(null);
+    showToast(`${ns.name} added! ✅`);
+  };
+
+  // ── Delete student
+  const deleteStudent = async (sid) => {
+    const list = students.filter(s => s.id !== sid);
+    setStudents(list);
+    const newAtt = { ...attendance }; delete newAtt[sid];
+    const newNotes = { ...notes }; delete newNotes[sid];
+    const newFees = { ...fees }; delete newFees[sid];
+    setAttendance(newAtt); setNotes(newNotes); setFees(newFees);
+    await pushStudents(list);
+    await pushAttendance(newAtt);
+    setModal(null);
+    showToast("Student removed", "err");
+  };
+
+  // ── Fee update
+  const updateFee = async (sid, paid) => {
+    const updated = { ...fees, [sid]: { paid: Number(paid), total: settings.feeTotal } };
+    setFees(updated);
+    await pushFees(updated);
+  };
+
+  // ── Note update
+  const updateNote = async (sid, note) => {
+    const updated = { ...notes, [sid]: note };
+    setNotes(updated);
+    await pushNotes(updated);
+  };
+
+  // ── Settings save
+  const saveSettings = async (s) => {
+    setSettings(s);
+    await pushSettings(s);
+    showToast("Settings saved ✅");
+  };
+
+  // ── WA Messages
+  const buildFullReport = (s) => {
+    const st = getStats(s.id);
+    const att = attendance[s.id] || {};
+    const absent = DAYS.filter(d => att[d]==="A");
+    const fee = fees[s.id] || { paid: 0, total: settings.feeTotal };
+    const note = notes[s.id] || "";
+    return `📚 *${settings.courseName}*\n*30-Day Full Report*\n\n` +
+      `👤 Student: *${s.name}*\n👨 Father: ${s.father}\n📱 ${s.phone}\n🏫 Batch: ${s.batch}\n\n` +
+      `📊 *Attendance Summary:*\n✅ Present: ${st.p} days\n❌ Absent: ${st.a} days\n🟡 Leave: ${st.l} days\n📈 Rate: *${st.pct}%*\n` +
+      (absent.length ? `\n⚠️ Absent days: ${absent.join(", ")}\n` : "") +
+      `\n💰 *Fee Status:*\nPaid: Rs. ${fee.paid} / Rs. ${fee.total}\n` +
+      (note ? `\n📝 Teacher Note: ${note}\n` : "") +
+      `\n_${settings.teacher} | ${settings.courseName}_`;
+  };
+
+  const buildWeekReport = (s, wi) => {
+    const w = WEEKS[wi];
+    const att = attendance[s.id] || {};
+    let p=0,a=0,l=0;
+    const lines = w.days.map(d => {
+      const v = att[d]||"";
+      if(v==="P")p++; else if(v==="A")a++; else if(v==="L")l++;
+      return `Day ${String(d).padStart(2,"0")}: ${v ? S_LABEL[v] : "Not Marked"}`;
+    }).join("\n");
+    return `📚 *${settings.courseName}*\n*${w.label} Report*\n\n` +
+      `👤 *${s.name}* | Father: ${s.father}\n\n` +
+      `✅ Present: ${p}  ❌ Absent: ${a}  🟡 Leave: ${l}\n\n` +
+      `📋 Day-wise:\n${lines}\n\n_${settings.teacher}_`;
+  };
+
+  const buildAbsentAlert = (s) => `⚠️ *Absence Alert — ${settings.courseName}*\n\nDear ${s.father} Sb,\n\n*${s.name}* was marked Absent on Day ${selectedDay}.\n\nKindly ensure regular attendance for better performance.\n\n_${settings.teacher}_`;
+
+  const buildLowAttAlert = (s) => {
+    const st = getStats(s.id);
+    return `⚠️ *Low Attendance Warning*\n\nDear ${s.father} Sb,\n\n*${s.name}* has only *${st.pct}%* attendance.\nPresent: ${st.p} | Absent: ${st.a} days\n\nPlease ensure your child attends regularly.\n\n_${settings.teacher} | ${settings.courseName}_`;
+  };
+
+  const buildFeeReminder = (s) => {
+    const fee = fees[s.id] || { paid: 0, total: settings.feeTotal };
+    const due = fee.total - fee.paid;
+    return `💰 *Fee Reminder — ${settings.courseName}*\n\nDear ${s.father} Sb,\n\n*${s.name}*\nTotal Fee: Rs. ${fee.total}\nPaid: Rs. ${fee.paid}\n⚠️ Due: *Rs. ${due}*\n\nKindly clear the dues at the earliest.\n\n_${settings.teacher}_`;
+  };
+
+  // ── Filtered students
+  const filtered = students.filter(s => {
+    const q = search.toLowerCase();
+    return (batchFilter==="All" || s.batch===batchFilter) &&
+      (s.name.toLowerCase().includes(q) || s.father.toLowerCase().includes(q) || s.phone.includes(q));
+  });
+
+  // ── Day summary
+  const daySummary = { P:0, A:0, L:0, "":0 };
+  filtered.forEach(s => { const v = attendance[s.id]?.[selectedDay]||""; daySummary[v]=(daySummary[v]||0)+1; });
+
+  // ─────────────────────────────────────────────────────────────
+  return (
+    <div style={{ minHeight:"100vh", background:c.bg, fontFamily:"'Segoe UI',system-ui,sans-serif", color:c.text, paddingBottom:80 }}>
+
+      {/* ── TOP BAR */}
+      <div style={{ background:"linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#0284c7 100%)", padding:"14px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:50, boxShadow:"0 2px 20px rgba(0,0,0,0.4)" }}>
+        <div>
+          <div style={{ fontSize:18, fontWeight:900, color:"#fff", letterSpacing:"-0.5px" }}>🎓 VacationPro</div>
+          <div style={{ fontSize:10, color:"rgba(255,255,255,0.65)", marginTop:1 }}>{settings.courseName}</div>
+        </div>
+        <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+          {/* Sync indicator */}
+          <div style={{ display:"flex", alignItems:"center", gap:5, background:"rgba(0,0,0,0.3)", borderRadius:20, padding:"4px 10px" }}>
+            <div style={{ width:7, height:7, borderRadius:"50%", background: syncStatus==="live"?"#22c55e": syncStatus==="syncing"?"#f59e0b": syncStatus==="error"?"#ef4444":"#4b5563", animation: syncStatus==="syncing"?"pulse 1s infinite":"none" }} />
+            <span style={{ fontSize:10, color:"rgba(255,255,255,0.8)", fontWeight:600 }}>
+              {syncStatus==="live"?"LIVE": syncStatus==="syncing"?"SYNC...": syncStatus==="error"?"ERROR":"OFFLINE"}
+            </span>
+          </div>
+          <button onClick={()=>setTheme(t=>t==="dark"?"light":"dark")}
+            style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:20, padding:"5px 10px", color:"#fff", cursor:"pointer", fontSize:14 }}>
+            {isDark?"☀️":"🌙"}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Firebase Setup Banner */}
+      {!fbConfigured && (
+        <div style={{ background:"linear-gradient(135deg,#7c2d12,#9a3412)", padding:"12px 16px", borderBottom:"1px solid #c2410c" }}>
+          <div style={{ fontWeight:700, color:"#fed7aa", fontSize:13 }}>🔥 Firebase Not Connected</div>
+          <div style={{ color:"#fdba74", fontSize:11, marginTop:3 }}>Go to Settings tab → Enter your Firebase URL to enable live sync across devices</div>
+        </div>
+      )}
+
+      {/* ── CONTENT */}
+      <div style={{ padding:"14px 14px 0", maxWidth:860, margin:"0 auto" }}>
+
+        {/* ════ ATTENDANCE TAB ════ */}
+        {tab==="attendance" && (
+          <div>
+            {/* Day picker */}
+            <div style={{ background:c.card, borderRadius:16, padding:14, marginBottom:14, border:`1px solid ${c.border}` }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontWeight:800, fontSize:16 }}>📅 Day {selectedDay} / 30</span>
+                <div style={{ display:"flex", gap:6 }}>
+                  {["P","A","L"].map(s=>(
+                    <button key={s} onClick={()=>markAll(s)}
+                      style={{ padding:"5px 10px", borderRadius:8, background:S_COLOR[s].bg, color:"#fff", border:"none", fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                      All {S_LABEL[s][0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
+                {DAYS.map(d=>{
+                  // check if this day has been marked for any student
+                  const marked = students.some(s=>(attendance[s.id]?.[d]));
+                  return (
+                    <button key={d} onClick={()=>setSelectedDay(d)}
+                      style={{ width:34, height:34, borderRadius:8, border:`2px solid ${selectedDay===d?c.accent:c.border}`, background:selectedDay===d?c.accent: marked?c.card2:c.bg, color:selectedDay===d?"#fff":marked?c.text:c.sub, fontWeight:700, fontSize:12, cursor:"pointer", position:"relative" }}>
+                      {d}
+                      {marked && selectedDay!==d && <span style={{ position:"absolute", top:2, right:2, width:4, height:4, borderRadius:"50%", background:c.green }} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Summary chips */}
+            <div style={{ display:"flex", gap:8, marginBottom:14, flexWrap:"wrap" }}>
+              {[["P","Present",c.green],["A","Absent",c.red],["L","Leave",c.amber],["","Unmarked",c.sub]].map(([s,l,col])=>(
+                <div key={s} style={{ background:c.card, border:`1px solid ${c.border}`, borderRadius:10, padding:"8px 14px", display:"flex", gap:6, alignItems:"center" }}>
+                  <span style={{ fontWeight:800, fontSize:18, color:col }}>{daySummary[s]||0}</span>
+                  <span style={{ fontSize:11, color:c.sub }}>{l}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Search */}
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search student..."
+              style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card, color:c.text, fontSize:13, marginBottom:12, boxSizing:"border-box" }} />
+
+            {/* Student rows */}
+            {filtered.length===0 && <div style={{ textAlign:"center", padding:40, color:c.sub }}>No students</div>}
+            {filtered.map(s=>{
+              const status = attendance[s.id]?.[selectedDay]||"";
+              const sc = S_COLOR[status];
+              const stats = getStats(s.id);
+              return (
+                <div key={s.id} style={{ background:c.card, borderRadius:13, padding:"12px 14px", marginBottom:10, border:`1px solid ${c.border}`, display:"flex", alignItems:"center", gap:12 }}>
+                  <div style={{ width:42, height:42, borderRadius:"50%", background:"linear-gradient(135deg,#1d4ed8,#0284c7)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:900, fontSize:17, flexShrink:0 }}>
+                    {s.name[0]}
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontWeight:700, fontSize:14, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{s.name}</div>
+                    <div style={{ fontSize:11, color:c.sub }}>👨 {s.father} • {s.batch}</div>
+                    <div style={{ fontSize:10, color:stats.pct>=75?c.green:c.red, fontWeight:700, marginTop:2 }}>{stats.pct}% att • P:{stats.p} A:{stats.a}</div>
+                  </div>
+                  <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                    <button onClick={()=>toggleAtt(s.id,selectedDay)}
+                      style={{ padding:"8px 16px", borderRadius:10, background:sc.bg, color:sc.text, border:`1px solid ${c.border}`, fontWeight:700, fontSize:13, cursor:"pointer", minWidth:86, transition:"all 0.15s" }}>
+                      {status ? S_LABEL[status] : "Mark ↓"}
+                    </button>
+                    {status==="A" && (
+                      <a href={waLink(s.phone, buildAbsentAlert(s))} target="_blank" rel="noreferrer"
+                        style={{ padding:"8px 10px", borderRadius:10, background:"#25d366", color:"#fff", fontSize:13, textDecoration:"none" }}>📱</a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ════ STUDENTS TAB ════ */}
+        {tab==="students" && (
+          <div>
+            <div style={{ display:"flex", gap:10, marginBottom:14, flexWrap:"wrap" }}>
+              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search..."
+                style={{ flex:1, minWidth:130, padding:"10px 14px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card, color:c.text, fontSize:13 }} />
+              <select value={batchFilter} onChange={e=>setBatchFilter(e.target.value)}
+                style={{ padding:"10px 12px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card, color:c.text, fontSize:13 }}>
+                <option>All</option><option>Morning</option><option>Evening</option>
+              </select>
+              <button onClick={()=>setModal({type:"addStudent"})}
+                style={{ padding:"10px 16px", borderRadius:10, background:"linear-gradient(135deg,#1d4ed8,#0284c7)", color:"#fff", border:"none", fontWeight:700, cursor:"pointer", fontSize:13 }}>
+                ＋ Add
+              </button>
+            </div>
+
+            {filtered.map(s=>{
+              const stats = getStats(s.id);
+              const fee = fees[s.id]||{paid:0,total:settings.feeTotal};
+              const feeColor = fee.paid>=fee.total ? c.green : fee.paid>0 ? c.amber : c.red;
+              return (
+                <div key={s.id} style={{ background:c.card, borderRadius:14, padding:16, marginBottom:12, border:`1px solid ${c.border}` }}>
+                  <div style={{ display:"flex", gap:12, alignItems:"flex-start" }}>
+                    <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(135deg,#1d4ed8,#0284c7)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:900, fontSize:19, flexShrink:0 }}>
+                      {s.name[0]}
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontWeight:800, fontSize:15 }}>{s.name}</div>
+                      <div style={{ fontSize:12, color:c.sub, marginTop:2 }}>👨 {s.father} • 📱 {s.phone}</div>
+                      <div style={{ fontSize:11, color:c.sub }}>🏫 {s.batch}</div>
+                    </div>
+                    <div style={{ textAlign:"right" }}>
+                      <div style={{ fontWeight:900, fontSize:20, color:stats.pct>=75?c.green:c.red }}>{stats.pct}%</div>
+                      <div style={{ fontSize:10, color:c.sub }}>P:{stats.p} A:{stats.a} L:{stats.l}</div>
+                    </div>
+                  </div>
+
+                  {/* Fee bar */}
+                  <div style={{ marginTop:12, background:c.card2, borderRadius:8, overflow:"hidden", height:6 }}>
+                    <div style={{ height:"100%", width:`${Math.min(100,Math.round(fee.paid/fee.total*100))}%`, background:feeColor, transition:"width 0.5s" }} />
+                  </div>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
+                    <span style={{ fontSize:10, color:feeColor, fontWeight:700 }}>Fee: Rs.{fee.paid}/{fee.total}</span>
+                    {notes[s.id] && <span style={{ fontSize:10, color:c.sub }}>📝 Note exists</span>}
+                  </div>
+
+                  <div style={{ display:"flex", gap:8, marginTop:12, flexWrap:"wrap" }}>
+                    <button onClick={()=>setModal({type:"studentDetail",data:s})}
+                      style={{ flex:1, padding:"8px", borderRadius:9, background:c.card2, border:`1px solid ${c.border}`, color:c.text, fontSize:12, fontWeight:600, cursor:"pointer" }}>
+                      📋 Detail
+                    </button>
+                    <button onClick={()=>setModal({type:"fee",data:s})}
+                      style={{ flex:1, padding:"8px", borderRadius:9, background:c.card2, border:`1px solid ${c.border}`, color:c.text, fontSize:12, fontWeight:600, cursor:"pointer" }}>
+                      💰 Fee
+                    </button>
+                    <a href={waLink(s.phone,buildFullReport(s))} target="_blank" rel="noreferrer"
+                      style={{ flex:1, padding:"8px", borderRadius:9, background:"#25d366", color:"#fff", fontSize:12, fontWeight:700, textAlign:"center", textDecoration:"none" }}>
+                      📤 WA
+                    </a>
+                    <a href={waLink(s.phone,buildFeeReminder(s))} target="_blank" rel="noreferrer"
+                      style={{ flex:1, padding:"8px", borderRadius:9, background:"#f59e0b", color:"#fff", fontSize:12, fontWeight:700, textAlign:"center", textDecoration:"none" }}>
+                      💸 Fee WA
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ════ REPORTS TAB ════ */}
+        {tab==="reports" && (
+          <div>
+            <div style={{ fontWeight:800, fontSize:16, marginBottom:14 }}>📊 Weekly Reports</div>
+            {students.map(s=>(
+              <div key={s.id} style={{ background:c.card, borderRadius:14, padding:16, marginBottom:14, border:`1px solid ${c.border}` }}>
+                <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:12 }}>
+                  <div style={{ width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg,#1d4ed8,#0284c7)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:900, fontSize:16 }}>{s.name[0]}</div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontWeight:700 }}>{s.name}</div>
+                    <div style={{ fontSize:11, color:c.sub }}>{s.father} • {s.phone}</div>
+                  </div>
+                  <a href={waLink(s.phone,buildFullReport(s))} target="_blank" rel="noreferrer"
+                    style={{ padding:"7px 12px", borderRadius:9, background:"#25d366", color:"#fff", fontSize:12, textDecoration:"none", fontWeight:700 }}>
+                    📤 Full
+                  </a>
+                </div>
+                <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
+                  {WEEKS.map((w,wi)=>{
+                    const att=attendance[s.id]||{};
+                    let p=0,a=0,l=0;
+                    w.days.forEach(d=>{ if(att[d]==="P")p++; else if(att[d]==="A")a++; else if(att[d]==="L")l++; });
+                    return (
+                      <a key={wi} href={waLink(s.phone,buildWeekReport(s,wi))} target="_blank" rel="noreferrer"
+                        style={{ flex:1, minWidth:80, background:c.card2, borderRadius:10, padding:"10px 8px", border:`1px solid ${c.border}`, textAlign:"center", textDecoration:"none", color:c.text }}>
+                        <div style={{ fontWeight:700, fontSize:11, color:c.accent }}>{w.label}</div>
+                        <div style={{ fontSize:10, marginTop:4, color:c.sub }}>✅{p} ❌{a} 🟡{l}</div>
+                        <div style={{ fontSize:9, color:"#25d366", marginTop:3, fontWeight:700 }}>Send ↗</div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ════ ANALYSIS TAB ════ */}
+        {tab==="analysis" && (
+          <div>
+            {/* KPI cards */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:16 }}>
+              {[
+                { icon:"👥", label:"Students", val:students.length, col:c.accent },
+                { icon:"📈", label:"Avg Att%", val: students.length ? Math.round(students.reduce((s,st)=>s+getStats(st.id).pct,0)/students.length)+"%" : "0%", col:c.green },
+                { icon:"❌", label:"Total Absent", val:students.reduce((s,st)=>s+getStats(st.id).a,0), col:c.red },
+                { icon:"💰", label:"Fee Collected", val:"Rs."+students.reduce((s,st)=>s+(fees[st.id]?.paid||0),0), col:c.amber },
+              ].map((item,i)=>(
+                <div key={i} style={{ background:c.card, borderRadius:14, padding:16, border:`1px solid ${c.border}`, display:"flex", gap:12, alignItems:"center" }}>
+                  <div style={{ fontSize:26 }}>{item.icon}</div>
+                  <div>
+                    <div style={{ fontSize:22, fontWeight:900, color:item.col }}>{item.val}</div>
+                    <div style={{ fontSize:11, color:c.sub }}>{item.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Attendance bars */}
+            <div style={{ background:c.card, borderRadius:14, padding:16, border:`1px solid ${c.border}`, marginBottom:14 }}>
+              <div style={{ fontWeight:700, marginBottom:14 }}>📊 Attendance per Student</div>
+              {students.map(s=>{
+                const st=getStats(s.id);
+                return (
+                  <div key={s.id} style={{ marginBottom:12 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+                      <span style={{ fontSize:13, fontWeight:600 }}>{s.name}</span>
+                      <span style={{ fontSize:12, fontWeight:800, color:st.pct>=75?c.green:c.red }}>{st.pct}%</span>
+                    </div>
+                    <div style={{ height:8, background:c.card2, borderRadius:4, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${st.pct}%`, background:st.pct>=75?c.green:c.red, borderRadius:4, transition:"width 0.6s" }} />
+                    </div>
+                    <div style={{ fontSize:10, color:c.sub, marginTop:2 }}>P:{st.p} A:{st.a} L:{st.l} / {st.total} days marked</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Low attendance */}
+            {(() => {
+              const low = students.filter(s=>getStats(s.id).pct<75 && getStats(s.id).total>0);
+              return low.length>0 && (
+                <div style={{ background:isDark?"#1c0a0a":"#fff5f5", borderRadius:14, padding:16, border:`1px solid ${c.red}`, marginBottom:14 }}>
+                  <div style={{ fontWeight:700, color:c.red, marginBottom:10 }}>⚠️ Low Attendance (&lt;75%)</div>
+                  {low.map(s=>{
+                    const st=getStats(s.id);
+                    return (
+                      <div key={s.id} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8, flexWrap:"wrap", gap:8 }}>
+                        <div>
+                          <span style={{ fontWeight:600 }}>{s.name}</span>
+                          <span style={{ color:c.sub, fontSize:12 }}> — {st.pct}% ({st.a} absents)</span>
+                        </div>
+                        <a href={waLink(s.phone,buildLowAttAlert(s))} target="_blank" rel="noreferrer"
+                          style={{ padding:"6px 12px", borderRadius:8, background:"#25d366", color:"#fff", fontSize:12, textDecoration:"none", fontWeight:700 }}>
+                          📱 Alert
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+
+            {/* Fee overview */}
+            <div style={{ background:c.card, borderRadius:14, padding:16, border:`1px solid ${c.border}` }}>
+              <div style={{ fontWeight:700, marginBottom:12 }}>💰 Fee Collection</div>
+              {students.map(s=>{
+                const fee=fees[s.id]||{paid:0,total:settings.feeTotal};
+                const pct=Math.round(fee.paid/fee.total*100);
+                const col=fee.paid>=fee.total?c.green:fee.paid>0?c.amber:c.red;
+                return (
+                  <div key={s.id} style={{ marginBottom:12 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+                      <span style={{ fontSize:13 }}>{s.name}</span>
+                      <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                        <span style={{ fontSize:12, color:col, fontWeight:700 }}>Rs.{fee.paid}/{fee.total}</span>
+                        <a href={waLink(s.phone,buildFeeReminder(s))} target="_blank" rel="noreferrer"
+                          style={{ fontSize:10, color:"#25d366", textDecoration:"none", fontWeight:700 }}>WA</a>
+                      </div>
+                    </div>
+                    <div style={{ height:6, background:c.card2, borderRadius:4, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${pct}%`, background:col, borderRadius:4, transition:"width 0.6s" }} />
+                    </div>
+                  </div>
+                );
+              })}
+              <div style={{ marginTop:12, paddingTop:12, borderTop:`1px solid ${c.border}`, display:"flex", justifyContent:"space-between" }}>
+                <span style={{ fontWeight:700 }}>Total Collected</span>
+                <span style={{ fontWeight:900, color:c.green }}>Rs. {students.reduce((s,st)=>s+(fees[st.id]?.paid||0),0)} / {students.length*settings.feeTotal}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ════ SETTINGS TAB ════ */}
+        {tab==="settings" && (
+          <SettingsPanel settings={settings} onSave={saveSettings} fbConfigured={fbConfigured} setFbConfigured={setFbConfigured} c={c} lastSync={lastSync} syncStatus={syncStatus} onManualSync={pullFromFirebase} />
+        )}
+      </div>
+
+      {/* ── BOTTOM NAV */}
+      <div style={{ position:"fixed", bottom:0, left:0, right:0, background:c.card, borderTop:`1px solid ${c.border}`, display:"flex", zIndex:50 }}>
+        {TABS.map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)}
+            style={{ flex:1, padding:"10px 4px", border:"none", background:"transparent", color:tab===t.id?c.accent:c.sub, fontWeight:tab===t.id?700:400, fontSize:10, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:2, borderTop:`2px solid ${tab===t.id?c.accent:"transparent"}` }}>
+            <span style={{ fontSize:18 }}>{t.icon}</span>
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* ── MODALS */}
+      {modal && (
+        <ModalWrapper onClose={()=>setModal(null)} c={c}>
+          {modal.type==="addStudent" && <AddStudentModal onAdd={addStudent} onClose={()=>setModal(null)} c={c} />}
+          {modal.type==="studentDetail" && <StudentDetailModal s={modal.data} attendance={attendance} notes={notes} stats={getStats(modal.data.id)} onDelete={deleteStudent} onNoteUpdate={updateNote} buildFullReport={buildFullReport} waLink={waLink} onClose={()=>setModal(null)} c={c} DAYS={DAYS} S_COLOR={S_COLOR} />}
+          {modal.type==="fee" && <FeeModal s={modal.data} fee={fees[modal.data.id]||{paid:0,total:settings.feeTotal}} onUpdate={updateFee} buildFeeReminder={buildFeeReminder} waLink={waLink} onClose={()=>setModal(null)} c={c} />}
+        </ModalWrapper>
+      )}
+
+      {/* ── TOAST */}
+      {toast && (
+        <div style={{ position:"fixed", bottom:80, left:"50%", transform:"translateX(-50%)", background:toast.type==="err"?"#dc2626":"#16a34a", color:"#fff", padding:"11px 22px", borderRadius:12, fontWeight:700, fontSize:13, zIndex:200, boxShadow:"0 4px 20px rgba(0,0,0,0.4)", whiteSpace:"nowrap" }}>
+          {toast.msg}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        * { -webkit-tap-highlight-color: transparent; }
+        input,select,button { outline:none; }
+        ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:#1e3a8a; border-radius:4px; }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Modal Wrapper ───────────────────────────────────────────────
+function ModalWrapper({ children, onClose, c }) {
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"flex-end", justifyContent:"center", zIndex:100 }}
+      onClick={e=>{ if(e.target===e.currentTarget) onClose(); }}>
+      <div style={{ background:c.card, borderRadius:"20px 20px 0 0", padding:24, width:"100%", maxWidth:500, maxHeight:"90vh", overflowY:"auto", border:`1px solid ${c.border}` }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── Add Student Modal ───────────────────────────────────────────
+function AddStudentModal({ onAdd, onClose, c }) {
+  const [form, setForm] = useState({ name:"", father:"", phone:"", batch:"Morning" });
+  const set = (k,v) => setForm(p=>({...p,[k]:v}));
+  return (
+    <div>
+      <div style={{ fontWeight:800, fontSize:18, marginBottom:20 }}>➕ New Student</div>
+      {[["name","Student Name","👤"],["father","Father's Name","👨"],["phone","Phone (03XXXXXXXXX)","📱"]].map(([k,ph,ic])=>(
+        <input key={k} value={form[k]} onChange={e=>set(k,e.target.value)} placeholder={`${ic} ${ph}`}
+          style={{ width:"100%", padding:"12px 14px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card2, color:c.text, fontSize:14, marginBottom:10, boxSizing:"border-box" }} />
+      ))}
+      <select value={form.batch} onChange={e=>set("batch",e.target.value)}
+        style={{ width:"100%", padding:"12px 14px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card2, color:c.text, fontSize:14, marginBottom:20 }}>
+        <option>Morning</option><option>Evening</option>
+      </select>
+      <div style={{ display:"flex", gap:10 }}>
+        <button onClick={onClose} style={{ flex:1, padding:12, borderRadius:10, background:c.card2, border:`1px solid ${c.border}`, color:c.text, fontWeight:600, cursor:"pointer" }}>Cancel</button>
+        <button onClick={()=>{ if(form.name.trim()) onAdd(form); }}
+          style={{ flex:2, padding:12, borderRadius:10, background:"linear-gradient(135deg,#1d4ed8,#0284c7)", color:"#fff", border:"none", fontWeight:700, cursor:"pointer", fontSize:14 }}>
+          Add Student
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Student Detail Modal ────────────────────────────────────────
+function StudentDetailModal({ s, attendance, notes, stats, onDelete, onNoteUpdate, buildFullReport, waLink, onClose, c, DAYS, S_COLOR }) {
+  const [note, setNote] = useState(notes[s.id]||"");
+  const att = attendance[s.id]||{};
+  return (
+    <div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+        <div style={{ fontWeight:800, fontSize:18 }}>👤 {s.name}</div>
+        <button onClick={onClose} style={{ background:c.card2, border:`1px solid ${c.border}`, borderRadius:8, padding:"5px 11px", color:c.text, cursor:"pointer" }}>✕</button>
+      </div>
+      <div style={{ background:c.card2, borderRadius:12, padding:12, marginBottom:14, fontSize:13 }}>
+        <div style={{ marginBottom:5 }}>👨 Father: <b>{s.father}</b></div>
+        <div style={{ marginBottom:5 }}>📱 <b>{s.phone}</b></div>
+        <div>🏫 Batch: <b>{s.batch}</b></div>
+      </div>
+      <div style={{ display:"flex", gap:8, marginBottom:14 }}>
+        {[["Present",stats.p,"#16a34a"],["Absent",stats.a,"#dc2626"],["Leave",stats.l,"#d97706"],["Att%",stats.pct+"%","#2563eb"]].map(([l,v,col],i)=>(
+          <div key={i} style={{ flex:1, background:c.card2, borderRadius:10, padding:10, border:`1px solid ${c.border}`, textAlign:"center" }}>
+            <div style={{ fontWeight:900, fontSize:18, color:col }}>{v}</div>
+            <div style={{ fontSize:10, color:c.sub }}>{l}</div>
+          </div>
+        ))}
+      </div>
+      {/* Calendar */}
+      <div style={{ marginBottom:14 }}>
+        <div style={{ fontWeight:700, fontSize:13, marginBottom:8 }}>30-Day Calendar</div>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
+          {DAYS.map(d=>{
+            const st=att[d]||"";
+            const sc=S_COLOR[st];
+            return (
+              <div key={d} style={{ width:32, height:32, borderRadius:7, background:sc.bg, color:sc.text, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:700, border:`1px solid rgba(255,255,255,0.05)` }}>
+                <div style={{ fontSize:8, opacity:0.7 }}>{d}</div>
+                <div>{st||"·"}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {/* Note */}
+      <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="📝 Teacher note about this student..."
+        style={{ width:"100%", padding:"10px 12px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card2, color:c.text, fontSize:13, marginBottom:10, boxSizing:"border-box", minHeight:70, resize:"vertical" }} />
+      <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+        <button onClick={()=>onNoteUpdate(s.id,note)}
+          style={{ flex:1, padding:"10px", borderRadius:10, background:c.card2, border:`1px solid ${c.border}`, color:c.text, fontWeight:600, cursor:"pointer", fontSize:12 }}>💾 Save Note</button>
+        <a href={waLink(s.phone,buildFullReport(s))} target="_blank" rel="noreferrer"
+          style={{ flex:1, padding:"10px", borderRadius:10, background:"#25d366", color:"#fff", fontSize:12, textDecoration:"none", fontWeight:700, textAlign:"center" }}>
+          📤 WA Report
+        </a>
+        <button onClick={()=>{ if(window.confirm(`Remove ${s.name}?`)) onDelete(s.id); }}
+          style={{ padding:"10px 14px", borderRadius:10, background:"#dc2626", border:"none", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+          🗑
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Fee Modal ───────────────────────────────────────────────────
+function FeeModal({ s, fee, onUpdate, buildFeeReminder, waLink, onClose, c }) {
+  const [paid, setPaid] = useState(fee.paid);
+  const due = fee.total - paid;
+  return (
+    <div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+        <div style={{ fontWeight:800, fontSize:17 }}>💰 Fee — {s.name}</div>
+        <button onClick={onClose} style={{ background:c.card2, border:`1px solid ${c.border}`, borderRadius:8, padding:"5px 11px", color:c.text, cursor:"pointer" }}>✕</button>
+      </div>
+      <div style={{ display:"flex", gap:10, marginBottom:16 }}>
+        {[["Total","Rs."+fee.total,"#2563eb"],["Paid","Rs."+paid,"#16a34a"],["Due","Rs."+due,due>0?"#dc2626":"#16a34a"]].map(([l,v,col],i)=>(
+          <div key={i} style={{ flex:1, background:c.card2, borderRadius:10, padding:12, border:`1px solid ${c.border}`, textAlign:"center" }}>
+            <div style={{ fontWeight:900, fontSize:17, color:col }}>{v}</div>
+            <div style={{ fontSize:11, color:c.sub }}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ height:8, background:c.card2, borderRadius:4, overflow:"hidden", marginBottom:16 }}>
+        <div style={{ height:"100%", width:`${Math.min(100,Math.round(paid/fee.total*100))}%`, background:due<=0?"#16a34a":"#d97706", borderRadius:4, transition:"width 0.4s" }} />
+      </div>
+      <input type="number" value={paid} onChange={e=>setPaid(Number(e.target.value))} min={0} max={fee.total}
+        placeholder="Enter amount paid"
+        style={{ width:"100%", padding:"12px 14px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card2, color:c.text, fontSize:15, marginBottom:14, boxSizing:"border-box" }} />
+      <div style={{ display:"flex", gap:8 }}>
+        <button onClick={()=>{ onUpdate(s.id,paid); onClose(); }}
+          style={{ flex:2, padding:12, borderRadius:10, background:"linear-gradient(135deg,#1d4ed8,#0284c7)", color:"#fff", border:"none", fontWeight:700, cursor:"pointer", fontSize:14 }}>
+          💾 Save Fee
+        </button>
+        <a href={waLink(s.phone,buildFeeReminder(s))} target="_blank" rel="noreferrer"
+          style={{ flex:1, padding:12, borderRadius:10, background:"#25d366", color:"#fff", fontSize:13, textDecoration:"none", fontWeight:700, textAlign:"center" }}>
+          📱 Remind
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ─── Settings Panel ──────────────────────────────────────────────
+function SettingsPanel({ settings, onSave, fbConfigured, setFbConfigured, c, lastSync, syncStatus, onManualSync }) {
+  const [form, setForm] = useState(settings);
+  const [fbUrl, setFbUrl] = useState(FIREBASE_URL);
+
+  const applyFirebase = () => {
+    if (fbUrl && fbUrl.includes("firebaseio.com")) {
+      // In real deployment, this would update the constant
+      // For now, guide the user
+      setFbConfigured(true);
+      alert("✅ Firebase URL noted!\n\nTo fully activate, replace the FIREBASE_URL constant at the top of the code with:\n\n" + fbUrl);
+    }
+  };
+
+  return (
+    <div>
+      {/* Firebase status */}
+      <div style={{ background:c.card, borderRadius:14, padding:16, border:`1px solid ${c.border}`, marginBottom:14 }}>
+        <div style={{ fontWeight:800, fontSize:15, marginBottom:12 }}>🔥 Firebase Sync</div>
+        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+          <div style={{ width:10, height:10, borderRadius:"50%", background: syncStatus==="live"?"#22c55e": syncStatus==="syncing"?"#f59e0b":"#ef4444" }} />
+          <span style={{ fontSize:13, fontWeight:600 }}>{fbConfigured?"Connected":"Not Connected"}</span>
+          {lastSync && <span style={{ fontSize:11, color:c.sub }}>Last: {lastSync.toLocaleTimeString()}</span>}
+        </div>
+        <input value={fbUrl} onChange={e=>setFbUrl(e.target.value)}
+          placeholder="https://your-project-default-rtdb.firebaseio.com"
+          style={{ width:"100%", padding:"10px 12px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card2, color:c.text, fontSize:12, marginBottom:10, boxSizing:"border-box" }} />
+        <div style={{ display:"flex", gap:8 }}>
+          <button onClick={applyFirebase}
+            style={{ flex:1, padding:"10px", borderRadius:10, background:"linear-gradient(135deg,#ea580c,#dc2626)", color:"#fff", border:"none", fontWeight:700, cursor:"pointer", fontSize:13 }}>
+            🔥 Connect Firebase
+          </button>
+          {fbConfigured && (
+            <button onClick={onManualSync}
+              style={{ flex:1, padding:"10px", borderRadius:10, background:c.card2, border:`1px solid ${c.border}`, color:c.text, fontWeight:600, cursor:"pointer", fontSize:13 }}>
+              🔄 Sync Now
+            </button>
+          )}
+        </div>
+
+        {/* Setup guide */}
+        <div style={{ background:c.card2, borderRadius:10, padding:12, marginTop:12, border:`1px solid ${c.border}` }}>
+          <div style={{ fontWeight:700, fontSize:12, marginBottom:6 }}>📖 Firebase Setup (Free)</div>
+          <div style={{ fontSize:11, color:c.sub, lineHeight:1.7 }}>
+            1. Go to <b style={{color:c.accent}}>console.firebase.google.com</b><br/>
+            2. Create New Project (free)<br/>
+            3. Click <b>Realtime Database</b> → Create<br/>
+            4. Choose <b>Test Mode</b> (for now)<br/>
+            5. Copy the database URL above<br/>
+            6. Paste URL in code → line 1: FIREBASE_URL<br/>
+            7. Deploy on <b>Netlify / Vercel / Firebase Hosting</b>
+          </div>
+        </div>
+      </div>
+
+      {/* Course settings */}
+      <div style={{ background:c.card, borderRadius:14, padding:16, border:`1px solid ${c.border}`, marginBottom:14 }}>
+        <div style={{ fontWeight:800, fontSize:15, marginBottom:12 }}>🎓 Course Settings</div>
+        {[["courseName","Course Name","📚"],["teacher","Teacher Name","👨‍🏫"]].map(([k,ph,ic])=>(
+          <input key={k} value={form[k]} onChange={e=>setForm(p=>({...p,[k]:e.target.value}))}
+            placeholder={`${ic} ${ph}`}
+            style={{ width:"100%", padding:"11px 13px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card2, color:c.text, fontSize:13, marginBottom:10, boxSizing:"border-box" }} />
+        ))}
+        <div style={{ marginBottom:10 }}>
+          <div style={{ fontSize:12, color:c.sub, marginBottom:5 }}>💰 Default Fee Amount (Rs.)</div>
+          <input type="number" value={form.feeTotal} onChange={e=>setForm(p=>({...p,feeTotal:Number(e.target.value)}))}
+            style={{ width:"100%", padding:"11px 13px", borderRadius:10, border:`1px solid ${c.border}`, background:c.card2, color:c.text, fontSize:13, boxSizing:"border-box" }} />
+        </div>
+        <button onClick={()=>onSave(form)}
+          style={{ width:"100%", padding:12, borderRadius:10, background:"linear-gradient(135deg,#1d4ed8,#0284c7)", color:"#fff", border:"none", fontWeight:700, cursor:"pointer", fontSize:14 }}>
+          💾 Save Settings
+        </button>
+      </div>
+
+      {/* App info */}
+      <div style={{ background:c.card, borderRadius:14, padding:14, border:`1px solid ${c.border}`, textAlign:"center" }}>
+        <div style={{ fontSize:28, marginBottom:6 }}>🎓</div>
+        <div style={{ fontWeight:800, fontSize:16 }}>VacationPro</div>
+        <div style={{ fontSize:11, color:c.sub, marginTop:4 }}>30-Day Vacation Course Manager</div>
+        <div style={{ fontSize:10, color:c.sub, marginTop:4 }}>Firebase Live Sync • WhatsApp Reports • Fee Tracking</div>
+      </div>
+    </div>
+  );
+}
