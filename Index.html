@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VacationPro</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white">
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        // --- PASTE YOUR CODE BELOW THIS LINE ---
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>🎓 VacationPro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#060d18;color:#e2e8f0;min-height:100vh;padding-bottom:70px}
+  input,select,textarea,button{font-family:inherit;outline:none}
+  button{cursor:pointer}
+  .card{background:#0d1b2e;border:1px solid #1a2d45;border-radius:14px;padding:16px;margin-bottom:12px}
+  .card2{background:#111f35}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer}
+  .btn-blue{background:linear-gradient(135deg,#1d4ed8,#0284c7);color:#fff}
+  .btn-green{background:#16a34a;color:#fff}
+  .btn-red{background:#dc2626;color:#fff}
+  .btn-gray{background:#111f35;border:1px solid #1a2d45;color:#e2e8f0}
+  .btn-wa{background:#25d366;color:#fff;text-decoration:none;display:inline-block;text-align:center}
+  .input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid #1a2d45;background:#111f35;color:#e2e8f0;font-size:14px;margin-bottom:10px}
+  .flex{display:flex;align-items:center}
+  .gap8{gap:8px}
+  .gap10{gap:10px}
+  .badge{border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600}
+  /* Top bar */
+  #topbar{background:linear-gradient(135deg,#1e3a8a,#1d4ed8,#0284c7);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 20px rgba(0,0,0,.4)}
+  /* Bottom nav */
+  #bottomnav{position:fixed;bottom:0;left:0;right:0;background:#0d1b2e;border-top:1px solid #1a2d45;display:flex;z-index:50}
+  .navbtn{flex:1;padding:10px 4px;border:none;background:transparent;color:#4a6080;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px;border-top:2px solid transparent;transition:all .2s}
+  .navbtn.active{color:#2563eb;border-top-color:#2563eb}
+  .navbtn span.icon{font-size:18px}
+  /* Sync dot */
+  .syncdot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  /* Avatar */
+  .avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#0284c7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
+  /* Day button */
+  .daybtn{width:34px;height:34px;border-radius:8px;border:2px solid #1a2d45;background:#060d18;color:#4a6080;font-weight:700;font-size:12px;position:relative}
+  .daybtn.selected{border-color:#2563eb;background:#2563eb;color:#fff}
+  .daybtn.marked{background:#111f35;color:#e2e8f0}
+  /* Status button */
+  .statbtn{min-width:88px;padding:8px 14px;border-radius:10px;border:1px solid #1a2d45;font-weight:700;font-size:13px}
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;z-index:100}
+  .modal{background:#0d1b2e;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;border:1px solid #1a2d45}
+  /* Toast */
+  #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:11px 22px;border-radius:12px;font-weight:700;font-size:13px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,.4);display:none;white-space:nowrap}
+  /* Cal cell */
+  .calcell{width:32px;height:32px;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:1px solid rgba(255,255,255,.05)}
+  /* Progress bar */
+  .progbar{height:7px;background:#111f35;border-radius:4px;overflow:hidden;margin:6px 0}
+  .progfill{height:100%;border-radius:4px;transition:width .5s}
+  /* Wrap */
+  #content{padding:14px;max-width:860px;margin:0 auto}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .pulsing{animation:pulse 1s infinite}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#1e3a8a;border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div>
+    <div style="font-size:18px;font-weight:900;color:#fff">🎓 VacationPro</div>
+    <div id="coursename-label" style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px">Vacation Course 2025</div>
+  </div>
+  <div class="flex gap8">
+    <div class="flex gap8 badge" style="background:rgba(0,0,0,.3)">
+      <span class="syncdot" id="syncdot" style="background:#4b5563"></span>
+      <span id="synclabel" style="font-size:10px;color:rgba(255,255,255,.8);font-weight:600">OFFLINE</span>
+    </div>
+    <button onclick="toggleTheme()" style="background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:5px 10px;color:#fff;font-size:14px">☀️</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div id="content"></div>
+
+<!-- BOTTOM NAV -->
+<div id="bottomnav">
+  <button class="navbtn active" id="nav-attendance" onclick="switchTab('attendance')"><span class="icon">📋</span><span>Attendance</span></button>
+  <button class="navbtn" id="nav-students" onclick="switchTab('students')"><span class="icon">👥</span><span>Students</span></button>
+  <button class="navbtn" id="nav-reports" onclick="switchTab('reports')"><span class="icon">📊</span><span>Reports</span></button>
+  <button class="navbtn" id="nav-analysis" onclick="switchTab('analysis')"><span class="icon">📈</span><span>Analysis</span></button>
+  <button class="navbtn" id="nav-settings" onclick="switchTab('settings')"><span class="icon">⚙️</span><span>Settings</span></button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// 🔥 FIREBASE
+// ═══════════════════════════════════════
+const FIREBASE_URL = "https://vacation-course-default-rtdb.firebaseio.com";
+
+const fb = {
+  async get(path){ try{ const r=await fetch(`${FIREBASE_URL}/${path}.json`); return r.ok?await r.json():null; }catch{return null;} },
+  async set(path,data){ try{ await fetch(`${FIREBASE_URL}/${path}.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); }catch(e){console.error(e);} },
+  async patch(path,data){ try{ await fetch(`${FIREBASE_URL}/${path}.json`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)}); }catch(e){console.error(e);} },
+  async del(path){ try{ await fetch(`${FIREBASE_URL}/${path}.json`,{method:"DELETE"}); }catch(e){console.error(e);} },
+};
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let state = {
+  tab: "attendance",
+  students: [],
+  attendance: {},   // {sid: {day: "P"|"A"|"L"}}
+  notes: {},        // {sid: "text"}
+  fees: {},         // {sid: {paid:0, total:3000}}
+  settings: { courseName:"Vacation Course 2025", teacher:"Khan Sir", feeTotal:3000 },
+  selectedDay: 1,
+  syncStatus: "idle",
+  lastSync: null,
+  search: "",
+  batchFilter: "All",
+};
+
+const DAYS = Array.from({length:30},(_,i)=>i+1);
+const WEEKS = [
+  {label:"Week 1",days:[1,2,3,4,5,6,7]},
+  {label:"Week 2",days:[8,9,10,11,12,13,14]},
+  {label:"Week 3",days:[15,16,17,18,19,20,21]},
+  {label:"Week 4",days:[22,23,24,25,26,27,28]},
+  {label:"Week 5",days:[29,30]},
+];
+const S_NEXT = {"":"P",P:"A",A:"L",L:"P"};
+const S_LABEL = {P:"Present",A:"Absent",L:"Leave","":"Mark ↓"};
+const S_BG = {P:"#16a34a",A:"#dc2626",L:"#d97706","":"#111f35"};
+const S_TEXT = {P:"#fff",A:"#fff",L:"#fff","":"#4a6080"};
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+// ═══════════════════════════════════════
+// FIREBASE SYNC
+// ═══════════════════════════════════════
+async function pullFirebase(){
+  setSyncStatus("syncing");
+  try{
+    const data = await fb.get("vacationpro");
+    if(data){
+      if(data.students) state.students = Object.values(data.students);
+      if(data.attendance) state.attendance = data.attendance;
+      if(data.notes) state.notes = data.notes;
+      if(data.fees) state.fees = data.fees;
+      if(data.settings) state.settings = {...state.settings,...data.settings};
+    }
+    setSyncStatus("live");
+    state.lastSync = new Date();
+    render();
+  }catch{setSyncStatus("error");}
+}
+
+function setSyncStatus(s){
+  state.syncStatus = s;
+  const dot = document.getElementById("syncdot");
+  const lbl = document.getElementById("synclabel");
+  if(!dot) return;
+  dot.style.background = s==="live"?"#22c55e":s==="syncing"?"#f59e0b":s==="error"?"#ef4444":"#4b5563";
+  dot.className = "syncdot" + (s==="syncing"?" pulsing":"");
+  lbl.textContent = s==="live"?"LIVE":s==="syncing"?"SYNC...":s==="error"?"ERROR":"OFFLINE";
+}
+
+async function pushStudents(){
+  const obj={};
+  state.students.forEach(s=>{obj[s.id]=s;});
+  await fb.set("vacationpro/students",obj);
+}
+async function pushAttendance(){ await fb.set("vacationpro/attendance",state.attendance); }
+async function pushNotes(){ await fb.set("vacationpro/notes",state.notes); }
+async function pushFees(){ await fb.set("vacationpro/fees",state.fees); }
+async function pushSettings(){ await fb.patch("vacationpro/settings",state.settings); }
+
+setInterval(pullFirebase, 8000);
+pullFirebase();
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function getStats(sid){
+  const att = state.attendance[sid]||{};
+  let p=0,a=0,l=0;
+  Object.values(att).forEach(v=>{if(v==="P")p++;else if(v==="A")a++;else if(v==="L")l++;});
+  const total=p+a+l;
+  return {p,a,l,total,pct:total?Math.round(p/total*100):0};
+}
+
+function waLink(phone,msg){
+  const clean=phone.replace(/\D/g,"");
+  const num=clean.startsWith("92")?clean:"92"+clean.replace(/^0/,"");
+  return `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+}
+
+function buildFullReport(s){
+  const st=getStats(s.id);
+  const att=state.attendance[s.id]||{};
+  const absent=DAYS.filter(d=>att[d]==="A");
+  const fee=state.fees[s.id]||{paid:0,total:state.settings.feeTotal};
+  const note=state.notes[s.id]||"";
+  return `📚 *${state.settings.courseName}*\n*30-Day Full Report*\n\n`+
+    `👤 Student: *${s.name}*\n👨 Father: ${s.father}\n📱 ${s.phone}\n🏫 Batch: ${s.batch}\n\n`+
+    `📊 *Attendance:*\n✅ Present: ${st.p} days\n❌ Absent: ${st.a} days\n🟡 Leave: ${st.l} days\n📈 Rate: *${st.pct}%*\n`+
+    (absent.length?`\n⚠️ Absent days: ${absent.join(", ")}\n`:"")+
+    `\n💰 *Fee:* Rs.${fee.paid} / Rs.${fee.total}\n`+
+    (note?`\n📝 Teacher Note: ${note}\n`:"")+
+    `\n_${state.settings.teacher} | ${state.settings.courseName}_`;
+}
+
+function buildWeekReport(s,wi){
+  const w=WEEKS[wi];
+  const att=state.attendance[s.id]||{};
+  let p=0,a=0,l=0;
+  const lines=w.days.map(d=>{
+    const v=att[d]||"";
+    if(v==="P")p++;else if(v==="A")a++;else if(v==="L")l++;
+    return `Day ${String(d).padStart(2,"0")}: ${v?S_LABEL[v]:"Not Marked"}`;
+  }).join("\n");
+  return `📚 *${state.settings.courseName}*\n*${w.label} Report*\n\n`+
+    `👤 *${s.name}* | Father: ${s.father}\n\n`+
+    `✅ Present: ${p}  ❌ Absent: ${a}  🟡 Leave: ${l}\n\n`+
+    `📋 Day-wise:\n${lines}\n\n_${state.settings.teacher}_`;
+}
+
+function buildAbsentAlert(s){
+  return `⚠️ *Absence Alert — ${state.settings.courseName}*\n\nDear ${s.father} Sb,\n\n*${s.name}* was marked Absent on Day ${state.selectedDay}.\n\nPlease ensure regular attendance.\n\n_${state.settings.teacher}_`;
+}
+
+function buildLowAttAlert(s){
+  const st=getStats(s.id);
+  return `⚠️ *Low Attendance Warning*\n\nDear ${s.father} Sb,\n\n*${s.name}* has only *${st.pct}%* attendance.\nPresent: ${st.p} | Absent: ${st.a}\n\nPlease ensure regular attendance.\n\n_${state.settings.teacher}_`;
+}
+
+function buildFeeReminder(s){
+  const fee=state.fees[s.id]||{paid:0,total:state.settings.feeTotal};
+  const due=fee.total-fee.paid;
+  return `💰 *Fee Reminder — ${state.settings.courseName}*\n\nDear ${s.father} Sb,\n\n*${s.name}*\nTotal: Rs.${fee.total} | Paid: Rs.${fee.paid}\n⚠️ Due: *Rs.${due}*\n\nKindly clear dues.\n\n_${state.settings.teacher}_`;
+}
+
+function filteredStudents(){
+  return state.students.filter(s=>{
+    const q=state.search.toLowerCase();
+    return (state.batchFilter==="All"||s.batch===state.batchFilter)&&
+      (s.name.toLowerCase().includes(q)||s.father.toLowerCase().includes(q)||s.phone.includes(q));
+  });
+}
+
+function showToast(msg,type="ok"){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.style.background=type==="err"?"#dc2626":"#16a34a";
+  t.style.display="block";
+  setTimeout(()=>t.style.display="none",3000);
+}
+
+// ═══════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════
+async function toggleAtt(sid,day){
+  const cur=(state.attendance[sid]||{})[day]||"";
+  const next=S_NEXT[cur];
+  if(!state.attendance[sid]) state.attendance[sid]={};
+  state.attendance[sid][day]=next;
+  setSyncStatus("syncing");
+  render();
+  await pushAttendance();
+  setSyncStatus("live");
+  state.lastSync=new Date();
+}
+
+async function markAll(status){
+  const fs=filteredStudents();
+  fs.forEach(s=>{
+    if(!state.attendance[s.id]) state.attendance[s.id]={};
+    state.attendance[s.id][state.selectedDay]=status;
+  });
+  render();
+  await pushAttendance();
+  showToast(`All marked ${S_LABEL[status]} — Day ${state.selectedDay}`);
+}
+
+async function addStudent(name,father,phone,batch){
+  if(!name.trim()){showToast("Enter student name","err");return;}
+  const ns={id:uid(),name:name.trim(),father:father.trim(),phone:phone.trim(),batch:batch||"Morning"};
+  state.students.push(ns);
+  closeModal();
+  render();
+  await pushStudents();
+  showToast(`${ns.name} added ✅`);
+}
+
+async function deleteStudent(sid){
+  if(!confirm("Remove this student?")) return;
+  state.students=state.students.filter(s=>s.id!==sid);
+  delete state.attendance[sid];
+  delete state.notes[sid];
+  delete state.fees[sid];
+  closeModal();
+  render();
+  await pushStudents();
+  await pushAttendance();
+  showToast("Student removed","err");
+}
+
+async function saveFee(sid,paid){
+  state.fees[sid]={paid:Number(paid),total:state.settings.feeTotal};
+  closeModal();
+  render();
+  await pushFees();
+  showToast("Fee saved ✅");
+}
+
+async function saveNote(sid,note){
+  state.notes[sid]=note;
+  await pushNotes();
+  showToast("Note saved ✅");
+}
+
+async function saveSettings(courseName,teacher,feeTotal){
+  state.settings={courseName,teacher,feeTotal:Number(feeTotal)};
+  document.getElementById("coursename-label").textContent=courseName;
+  closeModal();
+  render();
+  await pushSettings();
+  showToast("Settings saved ✅");
+}
+
+// ═══════════════════════════════════════
+// TAB SWITCH
+// ═══════════════════════════════════════
+function switchTab(tab){
+  state.tab=tab;
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("nav-"+tab).classList.add("active");
+  render();
+}
+
+function toggleTheme(){
+  // simple: toggle body bg
+  const dark = document.body.style.background==="#f0f6ff";
+  document.body.style.background=dark?"#060d18":"#f0f6ff";
+  document.body.style.color=dark?"#e2e8f0":"#0f172a";
+}
+
+// ═══════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════
+function closeModal(){
+  const o=document.getElementById("modal-overlay");
+  if(o) o.remove();
+}
+
+function showModal(html){
+  closeModal();
+  const div=document.createElement("div");
+  div.id="modal-overlay";
+  div.className="overlay";
+  div.innerHTML=`<div class="modal">${html}</div>`;
+  div.onclick=e=>{ if(e.target===div) closeModal(); };
+  document.body.appendChild(div);
+}
+
+function showAddStudentModal(){
+  showModal(`
+    <div style="font-weight:800;font-size:18px;margin-bottom:20px">➕ New Student</div>
+    <input class="input" id="m-name" placeholder="👤 Student Name"/>
+    <input class="input" id="m-father" placeholder="👨 Father's Name"/>
+    <input class="input" id="m-phone" placeholder="📱 Phone (03XXXXXXXXX)" type="tel"/>
+    <select class="input" id="m-batch">
+      <option>Morning</option><option>Evening</option>
+    </select>
+    <div class="flex gap8" style="margin-top:8px">
+      <button class="btn btn-gray" style="flex:1" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-blue" style="flex:2" onclick="addStudent(
+        document.getElementById('m-name').value,
+        document.getElementById('m-father').value,
+        document.getElementById('m-phone').value,
+        document.getElementById('m-batch').value
+      )">Add Student</button>
+    </div>
+  `);
+}
+
+function showStudentDetail(sid){
+  const s=state.students.find(x=>x.id===sid);
+  if(!s) return;
+  const st=getStats(sid);
+  const att=state.attendance[sid]||{};
+  const note=state.notes[sid]||"";
+  const calCells=DAYS.map(d=>{
+    const v=att[d]||"";
+    return `<div class="calcell" style="background:${S_BG[v]};color:${S_TEXT[v]}"><span style="font-size:8px;opacity:.7">${d}</span><span>${v||"·"}</span></div>`;
+  }).join("");
+  const pctColor=st.pct>=75?"#16a34a":"#dc2626";
+  showModal(`
+    <div class="flex gap8" style="justify-content:space-between;margin-bottom:18px">
+      <div style="font-weight:800;font-size:18px">👤 ${s.name}</div>
+      <button class="btn btn-gray" style="padding:5px 11px" onclick="closeModal()">✕</button>
+    </div>
+    <div class="card2" style="padding:12px;border-radius:12px;margin-bottom:14px;font-size:13px;border:1px solid #1a2d45">
+      <div style="margin-bottom:5px">👨 Father: <b>${s.father}</b></div>
+      <div style="margin-bottom:5px">📱 <b>${s.phone}</b></div>
+      <div>🏫 Batch: <b>${s.batch}</b></div>
+    </div>
+    <div class="flex gap8" style="margin-bottom:14px">
+      <div style="flex:1;background:#111f35;border-radius:10px;padding:10px;border:1px solid #1a2d45;text-align:center">
+        <div style="font-weight:900;font-size:18px;color:#16a34a">${st.p}</div><div style="font-size:10px;color:#4a6080">Present</div>
+      </div>
+      <div style="flex:1;background:#111f35;border-radius:10px;padding:10px;border:1px solid #1a2d45;text-align:center">
+        <div style="font-weight:900;font-size:18px;color:#dc2626">${st.a}</div><div style="font-size:10px;color:#4a6080">Absent</div>
+      </div>
+      <div style="flex:1;background:#111f35;border-radius:10px;padding:10px;border:1px solid #1a2d45;text-align:center">
+        <div style="font-weight:900;font-size:18px;color:#d97706">${st.l}</div><div style="font-size:10px;color:#4a6080">Leave</div>
+      </div>
+      <div style="flex:1;background:#111f35;border-radius:10px;padding:10px;border:1px solid #1a2d45;text-align:center">
+        <div style="font-weight:900;font-size:18px;color:${pctColor}">${st.pct}%</div><div style="font-size:10px;color:#4a6080">Att%</div>
+      </div>
+    </div>
+    <div style="font-weight:700;font-size:13px;margin-bottom:8px">30-Day Calendar</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">${calCells}</div>
+    <textarea id="m-note" class="input" style="min-height:65px;resize:vertical" placeholder="📝 Teacher note...">${note}</textarea>
+    <div class="flex gap8" style="flex-wrap:wrap">
+      <button class="btn btn-gray" style="flex:1" onclick="saveNote('${sid}',document.getElementById('m-note').value)">💾 Save Note</button>
+      <a class="btn btn-wa" style="flex:1;padding:10px" href="${waLink(s.phone,buildFullReport(s))}" target="_blank">📤 WA Report</a>
+      <button class="btn btn-red" style="padding:10px 14px" onclick="deleteStudent('${sid}')">🗑</button>
+    </div>
+  `);
+}
+
+function showFeeModal(sid){
+  const s=state.students.find(x=>x.id===sid);
+  if(!s) return;
+  const fee=state.fees[sid]||{paid:0,total:state.settings.feeTotal};
+  const pct=Math.min(100,Math.round(fee.paid/fee.total*100));
+  const due=fee.total-fee.paid;
+  const col=fee.paid>=fee.total?"#16a34a":fee.paid>0?"#d97706":"#dc2626";
+  showModal(`
+    <div class="flex gap8" style="justify-content:space-between;margin-bottom:18px">
+      <div style="font-weight:800;font-size:17px">💰 Fee — ${s.name}</div>
+      <button class="btn btn-gray" style="padding:5px 11px" onclick="closeModal()">✕</button>
+    </div>
+    <div class="flex gap8" style="margin-bottom:14px">
+      <div style="flex:1;background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;text-align:center">
+        <div style="font-weight:900;font-size:17px;color:#2563eb">Rs.${fee.total}</div><div style="font-size:11px;color:#4a6080">Total</div>
+      </div>
+      <div style="flex:1;background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;text-align:center">
+        <div style="font-weight:900;font-size:17px;color:#16a34a">Rs.${fee.paid}</div><div style="font-size:11px;color:#4a6080">Paid</div>
+      </div>
+      <div style="flex:1;background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;text-align:center">
+        <div style="font-weight:900;font-size:17px;color:${col}">Rs.${due}</div><div style="font-size:11px;color:#4a6080">Due</div>
+      </div>
+    </div>
+    <div class="progbar"><div class="progfill" style="width:${pct}%;background:${col}"></div></div>
+    <input class="input" id="m-paid" type="number" value="${fee.paid}" min="0" max="${fee.total}" placeholder="Amount paid" style="margin-top:12px"/>
+    <div class="flex gap8" style="margin-top:4px">
+      <button class="btn btn-blue" style="flex:2" onclick="saveFee('${sid}',document.getElementById('m-paid').value)">💾 Save Fee</button>
+      <a class="btn btn-wa" href="${waLink(s.phone,buildFeeReminder(s))}" target="_blank" style="flex:1;padding:10px">📱 Remind</a>
+    </div>
+  `);
+}
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+function render(){
+  const el=document.getElementById("content");
+  const fs=filteredStudents();
+
+  if(state.tab==="attendance") el.innerHTML=renderAttendance(fs);
+  else if(state.tab==="students") el.innerHTML=renderStudents(fs);
+  else if(state.tab==="reports") el.innerHTML=renderReports();
+  else if(state.tab==="analysis") el.innerHTML=renderAnalysis();
+  else if(state.tab==="settings") el.innerHTML=renderSettings();
+
+  // update course name label
+  document.getElementById("coursename-label").textContent=state.settings.courseName;
+}
+
+// ── ATTENDANCE ───────────────────────────────────────
+function renderAttendance(fs){
+  const day=state.selectedDay;
+  const summary={P:0,A:0,L:0,"":0};
+  fs.forEach(s=>{ const v=(state.attendance[s.id]||{})[day]||""; summary[v]=(summary[v]||0)+1; });
+
+  const dayBtns=DAYS.map(d=>{
+    const marked=state.students.some(s=>(state.attendance[s.id]||{})[d]);
+    const cls=d===day?"daybtn selected":marked?"daybtn marked":"daybtn";
+    return `<button class="${cls}" onclick="state.selectedDay=${d};render()">${d}</button>`;
+  }).join("");
+
+  const rows=fs.map(s=>{
+    const status=(state.attendance[s.id]||{})[day]||"";
+    const st=getStats(s.id);
+    const pctCol=st.pct>=75?"#16a34a":"#dc2626";
+    const alertBtn=status==="A"?`<a class="btn btn-wa" style="padding:8px 10px;font-size:13px" href="${waLink(s.phone,buildAbsentAlert(s))}" target="_blank">📱</a>`:"";
+    return `
+      <div class="card flex gap10" style="align-items:center;padding:12px 14px">
+        <div class="avatar">${s.name[0]}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
+          <div style="font-size:11px;color:#4a6080">${s.batch} • ${s.father}</div>
+          <div style="font-size:10px;font-weight:700;color:${pctCol};margin-top:2px">${st.pct}% • P:${st.p} A:${st.a}</div>
+        </div>
+        <button class="statbtn" style="background:${S_BG[status]};color:${S_TEXT[status]};border:1px solid #1a2d45"
+          onclick="toggleAtt('${s.id}',${day})">${S_LABEL[status]}</button>
+        ${alertBtn}
+      </div>`;
+  }).join("");
+
+  return `
+    <div class="card">
+      <div class="flex gap8" style="justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <span style="font-weight:800;font-size:16px">📅 Day ${day} / 30</span>
+        <div class="flex gap8">
+          <button class="btn" style="background:#16a34a;color:#fff;padding:5px 10px;font-size:11px" onclick="markAll('P')">All P</button>
+          <button class="btn" style="background:#dc2626;color:#fff;padding:5px 10px;font-size:11px" onclick="markAll('A')">All A</button>
+          <button class="btn" style="background:#d97706;color:#fff;padding:5px 10px;font-size:11px" onclick="markAll('L')">All L</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${dayBtns}</div>
+    </div>
+
+    <div class="flex gap8" style="margin-bottom:14px;flex-wrap:wrap">
+      ${[["P","Present","#16a34a"],["A","Absent","#dc2626"],["L","Leave","#d97706"],["","Unmarked","#4a6080"]].map(([s,l,c])=>`
+        <div class="card" style="flex:1;min-width:70px;padding:10px 12px;margin-bottom:0;text-align:center">
+          <div style="font-weight:900;font-size:20px;color:${c}">${summary[s]||0}</div>
+          <div style="font-size:10px;color:#4a6080">${l}</div>
+        </div>`).join("")}
+    </div>
+
+    <input class="input" style="margin-bottom:12px" placeholder="🔍 Search student..." 
+      value="${state.search}" oninput="state.search=this.value;render()"/>
+
+    ${fs.length===0?`<div style="text-align:center;padding:40px;color:#4a6080">No students found</div>`:rows}
+  `;
+}
+
+// ── STUDENTS ─────────────────────────────────────────
+function renderStudents(fs){
+  const cards=fs.map(s=>{
+    const st=getStats(s.id);
+    const fee=state.fees[s.id]||{paid:0,total:state.settings.feeTotal};
+    const feePct=Math.min(100,Math.round(fee.paid/fee.total*100));
+    const feeCol=fee.paid>=fee.total?"#16a34a":fee.paid>0?"#d97706":"#dc2626";
+    const pctCol=st.pct>=75?"#16a34a":"#dc2626";
+    return `
+      <div class="card">
+        <div class="flex gap10" style="align-items:flex-start;margin-bottom:10px">
+          <div class="avatar" style="width:46px;height:46px;font-size:19px">${s.name[0]}</div>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:15px">${s.name}</div>
+            <div style="font-size:12px;color:#4a6080;margin-top:2px">👨 ${s.father} • 📱 ${s.phone}</div>
+            <div style="font-size:11px;color:#4a6080">🏫 ${s.batch}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:900;font-size:20px;color:${pctCol}">${st.pct}%</div>
+            <div style="font-size:10px;color:#4a6080">P:${st.p} A:${st.a}</div>
+          </div>
+        </div>
+        <div class="progbar"><div class="progfill" style="width:${feePct}%;background:${feeCol}"></div></div>
+        <div class="flex gap8" style="justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:11px;color:${feeCol};font-weight:700">Fee: Rs.${fee.paid}/${fee.total}</span>
+          ${state.notes[s.id]?`<span style="font-size:10px;color:#4a6080">📝 Note</span>`:""}
+        </div>
+        <div class="flex gap8" style="flex-wrap:wrap">
+          <button class="btn btn-gray" style="flex:1;padding:8px" onclick="showStudentDetail('${s.id}')">📋 Detail</button>
+          <button class="btn btn-gray" style="flex:1;padding:8px" onclick="showFeeModal('${s.id}')">💰 Fee</button>
+          <a class="btn btn-wa" style="flex:1;padding:8px" href="${waLink(s.phone,buildFullReport(s))}" target="_blank">📤 WA</a>
+          <a class="btn" style="flex:1;padding:8px;background:#f59e0b;color:#fff;font-weight:700;text-align:center;text-decoration:none" href="${waLink(s.phone,buildFeeReminder(s))}" target="_blank">💸 Fee</a>
+        </div>
+      </div>`;
+  }).join("");
+
+  return `
+    <div class="flex gap10" style="margin-bottom:14px;flex-wrap:wrap">
+      <input class="input" style="flex:1;min-width:130px;margin-bottom:0" placeholder="🔍 Search..." 
+        value="${state.search}" oninput="state.search=this.value;render()"/>
+      <select class="input" style="width:auto;margin-bottom:0" onchange="state.batchFilter=this.value;render()">
+        <option ${state.batchFilter==="All"?"selected":""}>All</option>
+        <option ${state.batchFilter==="Morning"?"selected":""}>Morning</option>
+        <option ${state.batchFilter==="Evening"?"selected":""}>Evening</option>
+      </select>
+      <button class="btn btn-blue" style="white-space:nowrap" onclick="showAddStudentModal()">＋ Add</button>
+    </div>
+    ${fs.length===0?`<div style="text-align:center;padding:40px;color:#4a6080">No students</div>`:cards}
+  `;
+}
+
+// ── REPORTS ───────────────────────────────────────────
+function renderReports(){
+  const rows=state.students.map(s=>{
+    const weekBtns=WEEKS.map((w,wi)=>{
+      const att=state.attendance[s.id]||{};
+      let p=0,a=0,l=0;
+      w.days.forEach(d=>{if(att[d]==="P")p++;else if(att[d]==="A")a++;else if(att[d]==="L")l++;});
+      return `<a href="${waLink(s.phone,buildWeekReport(s,wi))}" target="_blank"
+        style="flex:1;min-width:80px;background:#111f35;border-radius:10px;padding:10px 8px;border:1px solid #1a2d45;text-align:center;text-decoration:none;color:#e2e8f0;display:block">
+        <div style="font-weight:700;font-size:11px;color:#2563eb">${w.label}</div>
+        <div style="font-size:10px;margin-top:4px;color:#4a6080">✅${p} ❌${a} 🟡${l}</div>
+        <div style="font-size:9px;color:#25d366;margin-top:3px;font-weight:700">Send ↗</div>
+      </a>`;
+    }).join("");
+    return `
+      <div class="card">
+        <div class="flex gap10" style="margin-bottom:12px">
+          <div class="avatar" style="width:40px;height:40px;font-size:16px">${s.name[0]}</div>
+          <div style="flex:1">
+            <div style="font-weight:700">${s.name}</div>
+            <div style="font-size:11px;color:#4a6080">${s.father} • ${s.phone}</div>
+          </div>
+          <a class="btn btn-wa" style="padding:7px 12px;font-size:12px" href="${waLink(s.phone,buildFullReport(s))}" target="_blank">📤 Full</a>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">${weekBtns}</div>
+      </div>`;
+  }).join("");
+
+  return `<div style="font-weight:800;font-size:16px;margin-bottom:14px">📊 Weekly Reports</div>${rows||`<div style="text-align:center;padding:40px;color:#4a6080">No students yet</div>`}`;
+}
+
+// ── ANALYSIS ──────────────────────────────────────────
+function renderAnalysis(){
+  const totalStudents=state.students.length;
+  const avgPct=totalStudents?Math.round(state.students.reduce((s,st)=>s+getStats(st.id).pct,0)/totalStudents):0;
+  const totalAbsent=state.students.reduce((s,st)=>s+getStats(st.id).a,0);
+  const totalFee=state.students.reduce((s,st)=>s+(state.fees[st.id]?.paid||0),0);
+
+  const kpis=[
+    {icon:"👥",label:"Students",val:totalStudents,col:"#2563eb"},
+    {icon:"📈",label:"Avg Att%",val:avgPct+"%",col:"#16a34a"},
+    {icon:"❌",label:"Total Absent",val:totalAbsent,col:"#dc2626"},
+    {icon:"💰",label:"Fee Collected",val:"Rs."+totalFee,col:"#d97706"},
+  ].map(k=>`
+    <div class="card flex gap10" style="align-items:center;padding:14px">
+      <div style="font-size:26px">${k.icon}</div>
+      <div><div style="font-size:22px;font-weight:900;color:${k.col}">${k.val}</div><div style="font-size:11px;color:#4a6080">${k.label}</div></div>
+    </div>`).join("");
+
+  const bars=state.students.map(s=>{
+    const st=getStats(s.id);
+    const col=st.pct>=75?"#16a34a":"#dc2626";
+    return `
+      <div style="margin-bottom:12px">
+        <div class="flex gap8" style="justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px;font-weight:600">${s.name}</span>
+          <span style="font-size:12px;font-weight:800;color:${col}">${st.pct}%</span>
+        </div>
+        <div class="progbar"><div class="progfill" style="width:${st.pct}%;background:${col}"></div></div>
+        <div style="font-size:10px;color:#4a6080">P:${st.p} A:${st.a} L:${st.l} / ${st.total} days</div>
+      </div>`;
+  }).join("");
+
+  const low=state.students.filter(s=>getStats(s.id).pct<75&&getStats(s.id).total>0);
+  const lowSection=low.length?`
+    <div class="card" style="border-color:#dc2626;background:#1c0a0a;margin-bottom:12px">
+      <div style="font-weight:700;color:#dc2626;margin-bottom:10px">⚠️ Low Attendance (&lt;75%)</div>
+      ${low.map(s=>{
+        const st=getStats(s.id);
+        return `<div class="flex gap8" style="justify-content:space-between;margin-bottom:8px;flex-wrap:wrap">
+          <div><span style="font-weight:600">${s.name}</span><span style="color:#4a6080;font-size:12px"> — ${st.pct}%</span></div>
+          <a class="btn btn-wa" style="padding:6px 12px;font-size:12px" href="${waLink(s.phone,buildLowAttAlert(s))}" target="_blank">📱 Alert</a>
+        </div>`;
+      }).join("")}
+    </div>`:"";
+
+  const feeRows=state.students.map(s=>{
+    const fee=state.fees[s.id]||{paid:0,total:state.settings.feeTotal};
+    const pct=Math.min(100,Math.round(fee.paid/fee.total*100));
+    const col=fee.paid>=fee.total?"#16a34a":fee.paid>0?"#d97706":"#dc2626";
+    return `
+      <div style="margin-bottom:12px">
+        <div class="flex gap8" style="justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px">${s.name}</span>
+          <div class="flex gap8">
+            <span style="font-size:12px;color:${col};font-weight:700">Rs.${fee.paid}/${fee.total}</span>
+            <a href="${waLink(s.phone,buildFeeReminder(s))}" target="_blank" style="font-size:10px;color:#25d366;font-weight:700;text-decoration:none">WA</a>
+          </div>
+        </div>
+        <div class="progbar"><div class="progfill" style="width:${pct}%;background:${col}"></div></div>
+      </div>`;
+  }).join("");
+
+  const totalFeeTarget=totalStudents*state.settings.feeTotal;
+
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${kpis}</div>
+    ${lowSection}
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-weight:700;margin-bottom:14px">📊 Attendance per Student</div>
+      ${bars||`<div style="color:#4a6080;font-size:13px">No students yet</div>`}
+    </div>
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:12px">💰 Fee Collection</div>
+      ${feeRows||`<div style="color:#4a6080;font-size:13px">No students yet</div>`}
+      ${totalStudents?`<div class="flex gap8" style="justify-content:space-between;padding-top:12px;border-top:1px solid #1a2d45;margin-top:4px">
+        <span style="font-weight:700">Total Collected</span>
+        <span style="font-weight:900;color:#16a34a">Rs.${totalFee} / ${totalFeeTarget}</span>
+      </div>`:""}
+    </div>
+  `;
+}
+
+// ── SETTINGS ──────────────────────────────────────────
+function renderSettings(){
+  const syncCol=state.syncStatus==="live"?"#22c55e":state.syncStatus==="syncing"?"#f59e0b":state.syncStatus==="error"?"#ef4444":"#4b5563";
+  const lastSyncStr=state.lastSync?state.lastSync.toLocaleTimeString():"Never";
+  return `
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-weight:800;font-size:15px;margin-bottom:12px">🔥 Firebase Status</div>
+      <div class="flex gap8" style="margin-bottom:12px">
+        <div class="syncdot" style="background:${syncCol}"></div>
+        <span style="font-size:13px;font-weight:600">${state.syncStatus==="live"?"Connected & Live":"Checking..."}</span>
+        <span style="font-size:11px;color:#4a6080">Last sync: ${lastSyncStr}</span>
+      </div>
+      <div style="background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;font-size:12px;color:#4a6080;line-height:1.8">
+        🔗 Database: <b style="color:#2563eb">vacation-course-default-rtdb</b><br>
+        ✅ Firebase URL is configured<br>
+        📡 Auto-syncs every 8 seconds
+      </div>
+      <button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="pullFirebase().then(()=>showToast('Synced! ✅'))">🔄 Sync Now</button>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-weight:800;font-size:15px;margin-bottom:12px">🎓 Course Settings</div>
+      <input class="input" id="s-course" value="${state.settings.courseName}" placeholder="Course Name"/>
+      <input class="input" id="s-teacher" value="${state.settings.teacher}" placeholder="Teacher Name"/>
+      <div style="font-size:12px;color:#4a6080;margin-bottom:6px">💰 Default Fee (Rs.)</div>
+      <input class="input" id="s-fee" type="number" value="${state.settings.feeTotal}" placeholder="Fee amount"/>
+      <button class="btn btn-blue" style="width:100%;margin-top:4px" onclick="saveSettings(
+        document.getElementById('s-course').value,
+        document.getElementById('s-teacher').value,
+        document.getElementById('s-fee').value
+      )">💾 Save Settings</button>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">🎓</div>
+      <div style="font-weight:800;font-size:16px">VacationPro</div>
+      <div style="font-size:11px;color:#4a6080;margin-top:6px;line-height:1.7">
+        30-Day Course Manager<br>
+        🔥 Firebase Live Sync<br>
+        📱 WhatsApp Reports<br>
+        💰 Fee Tracking
+      </div>
+    </div>
+  `;
+}
+
+// ── BOOT
+render();
+</script>
+</body>
+</html>
+
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />); 
+    </script>
+</body>
+</html>
