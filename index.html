@@ -114,12 +114,16 @@ textarea.inp{resize:vertical;min-height:65px}
 // ║  Each teacher has SEPARATE data in Firebase  ║
 // ╚══════════════════════════════════════════════╝
 const TEACHERS = [
-  { id:"khan",   name:"Khan Sir",    subject:"Mathematics", pin:"1111", color:"#1d4ed8" },
-  { id:"ahmed",  name:"Ahmed Sir",   subject:"Science",     pin:"2222", color:"#16a34a" },
-  { id:"sara",   name:"Sara Madam",  subject:"English",     pin:"3333", color:"#9333ea" },
-  { id:"tariq",  name:"Tariq Sir",   subject:"Islamiyat",   pin:"4444", color:"#dc2626" },
-  // Add more teachers like this:
-  // { id:"ali", name:"Ali Sir", subject:"Urdu", pin:"5555", color:"#d97706" },
+  // 🟦 Khan Sir = Grade B students (vacationpro path)
+  { id:"khan",   name:"Khan Sir",    subject:"Grade B",  pin:"1111", color:"#1d4ed8", dbPath:"vacationpro" },
+  // 🟩 Other Teachers = Grade A students (gradeA path)
+  { id:"ahmed",  name:"Ahmed Sir",   subject:"Grade A",  pin:"2222", color:"#16a34a", dbPath:"gradeA" },
+  { id:"sara",   name:"Sara Madam",  subject:"Grade A",  pin:"3333", color:"#9333ea", dbPath:"gradeA" },
+  { id:"tariq",  name:"Tariq Sir",   subject:"Grade A",  pin:"4444", color:"#dc2626", dbPath:"gradeA" },
+  // Add more Grade A teachers:
+  // { id:"ali", name:"Ali Sir", subject:"Grade A", pin:"5555", color:"#d97706", dbPath:"gradeA" },
+  // Add more Grade B teachers:
+  // { id:"bilal", name:"Bilal Sir", subject:"Grade B", pin:"6666", color:"#0891b2", dbPath:"vacationpro" },
 ];
 
 // 🔥 Firebase — your vacation-course project
@@ -178,12 +182,16 @@ function loginNow(){
   if(!picked){ toast("Tap your name first!",true); return; }
   const pin=document.getElementById("pinbox").value.trim();
   if(pin!==picked.pin){ toast("Wrong PIN ❌ Try again",true); document.getElementById("pinbox").value=""; return; }
-  ME=picked; DB=`teachers/${ME.id}`;
+  ME=picked; DB=ME.dbPath||"vacationpro"; // Each teacher uses their grade path
   ST.settings.teacher=ME.name;
   document.getElementById("loginscreen").style.display="none";
   document.getElementById("topbar").style.display="flex";
   document.getElementById("bnav").style.display="flex";
-  startSync();
+  document.getElementById("content").innerHTML=`<div style="text-align:center;padding:60px 20px;color:#4a6080"><div style="font-size:40px;margin-bottom:14px">⏳</div><div style="font-weight:700;font-size:16px">Loading students...</div><div style="font-size:12px;margin-top:8px">Syncing from Firebase</div></div>`;
+  // preload pushes Excel data, then pulls — then start heartbeat
+  preloadStudents().then(()=>{
+    startSync();
+  });
   toast(`Welcome ${ME.name}! 👋`);
 }
 
@@ -474,6 +482,37 @@ function pageSets(){
       <input class="inp" id="sf" type="number" value="${ST.settings.feeTotal}"/>
       <button class="btn btn-blue" style="width:100%;margin-top:4px" onclick="saveSettings(document.getElementById('sc').value,document.getElementById('st2').value,document.getElementById('sf').value)">💾 Save</button>
     </div>`;
+}
+
+
+// ═══════════════════════════════════════════════
+// 📥 PRELOADED STUDENTS FROM EXCEL
+// Grade B → Khan Sir (vacationpro path)
+// Grade A → Other Teachers (shared path)
+// ═══════════════════════════════════════════════
+const GRADE_B_STUDENTS = [{"id": "fvc1003", "name": "Muhammad arhan", "father": "", "phone": "99004544340", "batch": "Morning"}, {"id": "fvc1004", "name": "Sohail", "father": "", "phone": "70196647610", "batch": "Morning"}, {"id": "fvc1006", "name": "Nusayr", "father": "", "phone": "81472346610", "batch": "Morning"}, {"id": "fvc1007", "name": "Ziyan", "father": "", "phone": "99008033320", "batch": "Morning"}, {"id": "fvc1008", "name": "Muhammad mizan", "father": "", "phone": "70905111760", "batch": "Morning"}, {"id": "fvc1010", "name": "Abdulqadir.I.Sayyad", "father": "Irfanahmed .H.sayyad", "phone": "90363690800", "batch": "Morning"}, {"id": "fvc1011", "name": "AbdulRahman Junaid Mulla", "father": "Junaid A Mulla", "phone": "99006960640", "batch": "Morning"}, {"id": "fvc1015", "name": "Rehan Muzaffar Kureshi", "father": "", "phone": "77600776580", "batch": "Morning"}, {"id": "fvc1016", "name": "Mahammadgous Javeed Mujawar", "father": "Javeed", "phone": "72597481780", "batch": "Morning"}, {"id": "fvc1017", "name": "Muhammad Musab Javid Mulla", "father": "Javid Isak Mulla", "phone": "97430073730", "batch": "Morning"}, {"id": "fvc1018", "name": "Abbasali M Odekar", "father": "Moulali S Odekar", "phone": "89714268000", "batch": "Morning"}, {"id": "fvc1021", "name": "Ahmed kabir Bagewadi", "father": "Irfan Bagewadi", "phone": "98862264150", "batch": "Morning"}, {"id": "fvc1022", "name": "Anasraja Bagewadi", "father": "Irfan Bagewadi", "phone": "98862264150", "batch": "Morning"}, {"id": "fvc1025", "name": "Mohammad Kais khutbudin kalakoti", "father": "wasim g maniyar", "phone": "85500817120", "batch": "Morning"}, {"id": "fvc1026", "name": "Mohammad Saad khutbudin kalakoti", "father": "wasim g maniyar", "phone": "85500817120", "batch": "Morning"}, {"id": "fvc1027", "name": "Hussain wasim maniyar", "father": "wasim g maniyar", "phone": "85500817120", "batch": "Morning"}, {"id": "fvc1028", "name": "Mohammed ARZAAN", "father": "Nawaz Naikwadi", "phone": "90365384830", "batch": "Morning"}, {"id": "fvc1029", "name": "mufeez musa Gorikhan", "father": "musa", "phone": "96327015930", "batch": "Morning"}, {"id": "fvc1030", "name": "Mujahid shaikh", "father": "N", "phone": "89046653110", "batch": "Morning"}, {"id": "fvc1032", "name": "Rehab Amjad Shekh", "father": "Amjad", "phone": "91729901610", "batch": "Morning"}, {"id": "fvc1034", "name": "Mohammad Hushen Khoja", "father": "Yunus", "phone": "95912972170", "batch": "Morning"}, {"id": "fvc1035", "name": "Ayan MalikUchagaokar", "father": "Malik", "phone": "89514668270", "batch": "Morning"}, {"id": "fvc1036", "name": "Ziyan", "father": "Malikjaan. D. Tenginkeri", "phone": "99008033320", "batch": "Morning"}, {"id": "fvc1039", "name": "Mueez Abdul Rashid Patvegar", "father": "Abdul Rasheed A Patvegar", "phone": "88612291410", "batch": "Morning"}, {"id": "fvc1041", "name": "Almez A. Sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "97431203500", "batch": "Morning"}, {"id": "fvc1042", "name": "Alfan A. sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "97431203500", "batch": "Morning"}, {"id": "fvc1043", "name": "Zohair Ahmed Sameer Ahmed Pachapuri", "father": "Sameer Ahmed", "phone": "96323238870", "batch": "Morning"}, {"id": "fvc1044", "name": "Mahummed Arsh Waseem Attar", "father": "Waseem", "phone": "91132269310", "batch": "Morning"}, {"id": "fvc1045", "name": "Azmat Waseem Attar", "father": "Waseem", "phone": "91132269310", "batch": "Morning"}, {"id": "fvc1047", "name": "Ahmed raza", "father": "", "phone": "", "batch": "Morning"}, {"id": "fvc1049", "name": "Arhan Altaf savnoor", "father": "Altaf", "phone": "91648483480", "batch": "Morning"}, {"id": "fvc1050", "name": "Arman riyaz ahmed bepari", "father": "Riyas ahmed", "phone": "81230146520", "batch": "Morning"}, {"id": "fvc1052", "name": "muhammad Aalam", "father": "Nazeer sahab mulla", "phone": "97424144630", "batch": "Morning"}, {"id": "fvc1057", "name": "Toufiq Imamsahb Sheikh", "father": "Imamsahab", "phone": "86189479040", "batch": "Morning"}, {"id": "fvc1058", "name": "Arhan Muhammad Jamkhandi", "father": "Muhammad", "phone": "99808668300", "batch": "Morning"}, {"id": "fvc1061", "name": "Ayan malik Uchgaokar", "father": "Malik", "phone": "89514668270", "batch": "Morning"}, {"id": "fvc1062", "name": "Muhammad kaif baghban", "father": "Kamran", "phone": "98445507930", "batch": "Morning"}, {"id": "fvc1067", "name": "Ali Hasan mujawar", "father": "moinuddin", "phone": "97426623760", "batch": "Morning"}, {"id": "fvc1069", "name": "Umar farooq", "father": "Asfaq tadkor", "phone": "99455228210", "batch": "Morning"}];
+const GRADE_A_STUDENTS = [{"id": "fvc1001", "name": "zain tapalwale", "father": "Samiulla tapalwale", "phone": "9198804955130", "batch": "Morning"}, {"id": "fvc1002", "name": "Muhammad zaid. Nadeem maniyar.", "father": "", "phone": "80880314150", "batch": "Morning"}, {"id": "fvc1005", "name": "Hussain", "father": "", "phone": "86186674800", "batch": "Morning"}, {"id": "fvc1009", "name": "Abdullah ajaz yargatti", "father": "Ajaz. B.yargatti", "phone": "91088067710", "batch": "Morning"}, {"id": "fvc1012", "name": "Hussain Afsar Namakwale", "father": "Afsar Namakwale", "phone": "99452657480", "batch": "Morning"}, {"id": "fvc1013", "name": "Arhaan Imtiyaz Mulla", "father": "Imtiyaz Mulla", "phone": "97404253610", "batch": "Morning"}, {"id": "fvc1014", "name": "Mahammedfihaan Bepari", "father": "Qattalahmed Bepari", "phone": "93419666410", "batch": "Morning"}, {"id": "fvc1019", "name": "Mohammad Arkam Nalband", "father": "Juned nalband", "phone": "99642667830", "batch": "Morning"}, {"id": "fvc1020", "name": "HASNAIN Nalband", "father": "Juned nalband", "phone": "99642667830", "batch": "Morning"}, {"id": "fvc1023", "name": "Bilal salim hosmani", "father": "salim hosmani", "phone": "99806776050", "batch": "Morning"}, {"id": "fvc1024", "name": "husain salim hosmani", "father": "salim hosmani", "phone": "99806776050", "batch": "Morning"}, {"id": "fvc1031", "name": "Mohammad Noraiz Nazir Ahamed Tinwale", "father": "Nazir Ahamed", "phone": "91729901610", "batch": "Morning"}, {"id": "fvc1033", "name": "Ahmaz raza Gulzar sanadi", "father": "Gulzar sanadi", "phone": "72044171570", "batch": "Morning"}, {"id": "fvc1037", "name": "Arman Azhruddin Makandar", "father": "Azhruddin Makandar", "phone": "90350721700", "batch": "Morning"}, {"id": "fvc1038", "name": "sibtain makandar", "father": "asif makandar", "phone": "99006739780", "batch": "Morning"}, {"id": "fvc1040", "name": "Ali raza. A.sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "97431203500", "batch": "Morning"}, {"id": "fvc1051", "name": "Ahmed ashfaq Andewale", "father": "Ashfaq", "phone": "78160315000", "batch": "Morning"}, {"id": "fvc1053", "name": "Mahir ali", "father": "Toufiq", "phone": "96327015930", "batch": "Morning"}, {"id": "fvc1054", "name": "Muhammad hasnain Musa Gorikhan", "father": "musa Gorikhan", "phone": "96327015930", "batch": "Morning"}, {"id": "fvc1055", "name": "Muhammad mufeez", "father": "musa Gorikhan", "phone": "96327015930", "batch": "Morning"}, {"id": "fvc1056", "name": "Muhammad Mizan Hassan Sahab", "father": "Husain sahab", "phone": "70905111760", "batch": "Morning"}, {"id": "fvc1059", "name": "Mohammad zaid Nadeem maniyar", "father": "Nadeem maniyar", "phone": "98800937250", "batch": "Morning"}, {"id": "fvc1060", "name": "Arman Azriddin makandar", "father": "Azruddin", "phone": "74114026930", "batch": "Morning"}, {"id": "fvc1063", "name": "Muhammad mizan Husain sahab", "father": "Husain sahb", "phone": "97396951820", "batch": "Morning"}, {"id": "fvc1064", "name": "Bilal baig Todewale", "father": "Baig todewale", "phone": "87922132030", "batch": "Morning"}, {"id": "fvc1065", "name": "Mohammad ali", "father": "Zubair ahmed sandi", "phone": "94481259990", "batch": "Morning"}, {"id": "fvc1066", "name": "Abdullah Aijaz ahmed yargatti", "father": "Aijaz ahmed yargatti", "phone": "90362269490", "batch": "Morning"}, {"id": "fvc1068", "name": "Mohammad ali nangadkr", "father": "maqsood", "phone": "97397728280", "batch": "Morning"}];
+
+async function preloadStudents() {
+  // Always push on first open — no localStorage check
+  // so GitHub Pages refresh always gets fresh data
+
+  // Push Grade B to vacationpro
+  const existingB = await $fb.get("vacationpro/students") || {};
+  const mergedB = {...existingB};
+  GRADE_B_STUDENTS.forEach(s => { mergedB[s.id] = s; });
+  await $fb.set("vacationpro/students", mergedB);
+
+  // Push Grade A to gradeA
+  const existingA = await $fb.get("gradeA/students") || {};
+  const mergedA = {...existingA};
+  GRADE_A_STUDENTS.forEach(s => { mergedA[s.id] = s; });
+  await $fb.set("gradeA/students", mergedA);
+
+  console.log('✅ Students synced to Firebase');
+  
+  // Now pull so UI updates immediately after push
+  await pull();
 }
 
 // Boot
