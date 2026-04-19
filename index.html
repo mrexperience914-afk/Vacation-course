@@ -48,6 +48,10 @@ textarea.inp{resize:vertical;min-height:65px}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#1e3a8a;border-radius:4px}
 #content{padding:14px;max-width:860px;margin:0 auto}
 .lowcard{background:#1a0808;border:1px solid #7f1d1d;border-radius:14px;padding:16px;margin-bottom:12px}
+.photo-av{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #1a2d45}
+.photo-av-lg{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #1a2d45;display:block;margin:0 auto 10px}
+.photo-upload-btn{background:#111f35;border:2px dashed #1a2d45;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+.photo-upload-btn:hover{border-color:#3b82f6}
 
 /* LOGIN */
 #loginscreen{position:fixed;inset:0;background:#060d18;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
@@ -119,7 +123,7 @@ const TEACHERS = [
   // 🟩 Other Teachers = Grade A students (gradeA path)
   { id:"nadeem",  name:"Nadeem sir",   subject:"Grade A",  pin:"2526", color:"#16a34a", dbPath:"gradeA" },
   
-  // Add more Grade A teachers:
+  // 🟩 Other Teachers = Grade A students (
   // { id:"ali", name:"Ali Sir", subject:"Grade A", pin:"5555", color:"#d97706", dbPath:"gradeA" },
   // Add more Grade B teachers:
   // { id:"bilal", name:"Bilal Sir", subject:"Grade B", pin:"6666", color:"#0891b2", dbPath:"vacationpro" },
@@ -139,7 +143,7 @@ let ME = null;   // logged-in teacher
 let DB = "";     // Firebase path e.g. "teachers/khan"
 
 const ST = {
-  tab:"attendance", students:[], attendance:{}, notes:{}, fees:{},
+  tab:"attendance", students:[], attendance:{}, notes:{}, fees:{}, photos:{},
   settings:{courseName:"Vacation Course 2025",teacher:"",feeTotal:3000},
   day:1, sync:"idle", lastSync:null, search:"", batch:"All"
 };
@@ -151,6 +155,52 @@ const SLBL={P:"Present",A:"Absent",L:"Leave","":"Mark"};
 const SBG={P:"#16a34a",A:"#dc2626",L:"#d97706","":"#111f35"};
 const STXT={P:"#fff",A:"#fff",L:"#fff","":"#4a6080"};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+// Returns either <img> with photo or colored initial div
+function avHtml(sid, size=44, name="?", color="#1d4ed8"){
+  const photo = ST.photos[sid];
+  if(photo){
+    return `<img src="${photo}" class="photo-av" style="width:${size}px;height:${size}px" onerror="this.style.display='none'"/>`;
+  }
+  return `<div class="av" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.4)}px;background:${color}">${(name||"?")[0].toUpperCase()}</div>`;
+}
+
+// Compress image to base64 small enough for Firebase (max ~80KB)
+function compressPhoto(file, cb){
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 200; // px
+      let w=img.width, h=img.height;
+      if(w>h){ if(w>MAX){h=h*MAX/w;w=MAX;} } else { if(h>MAX){w=w*MAX/h;h=MAX;} }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      cb(canvas.toDataURL('image/jpeg', 0.7));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function pickPhoto(sid){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.capture='environment';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    compressPhoto(file, async (b64)=>{
+      await pushPhoto(sid, b64);
+      render();
+      // refresh modal if open
+      const mo = document.getElementById('moverlay');
+      if(mo) modalDetail(sid);
+      toast('📸 Photo saved!');
+    });
+  };
+  inp.click();
+}
 
 // ── Login ──────────────────────────────────────
 let picked = null;
@@ -226,6 +276,7 @@ async function pull(){
       if(data.fees)       ST.fees=data.fees;
       if(data.settings)   ST.settings={...ST.settings,...data.settings};
     }
+    if(data.photos) Object.assign(ST.photos, data.photos);
     dot("live"); ST.lastSync=new Date(); render();
   }catch{ dot("error"); }
 }
@@ -244,6 +295,8 @@ const pushA =async()=> $fb.set(`${DB}/attendance`,ST.attendance);
 const pushN =async()=> $fb.set(`${DB}/notes`,ST.notes);
 const pushF =async()=> $fb.set(`${DB}/fees`,ST.fees);
 const pushSt=async()=> $fb.patch(`${DB}/settings`,ST.settings);
+const pushPhoto=async(sid,b64)=>{ await $fb.set(`${DB}/photos/${sid}`,b64); ST.photos[sid]=b64; };
+const loadPhotos=async()=>{ const p=await $fb.get(`${DB}/photos`); if(p){ Object.assign(ST.photos,p); } };
 
 // ── Helpers ────────────────────────────────────
 function stats(sid){
@@ -354,10 +407,22 @@ function modalDetail(sid){
   const st=stats(sid),a=ST.attendance[sid]||{},note=ST.notes[sid]||"";
   const cells=DAYS.map(d=>{const v=a[d]||"";return `<div class="ccell" style="background:${SBG[v]};color:${STXT[v]}"><span style="opacity:.6">${d}</span><span>${v||"·"}</span></div>`;}).join("");
   const pc=st.pct>=75?"#16a34a":"#dc2626";
+  const hasPhoto=!!ST.photos[sid];
   showModal(`
     <div class="flex between g8" style="margin-bottom:16px">
       <div style="font-weight:800;font-size:18px">👤 ${s.name}</div>
       <button class="btn btn-gray" style="padding:5px 12px" onclick="closeModal()">✕</button>
+    </div>
+    <!-- PHOTO SECTION -->
+    <div style="text-align:center;margin-bottom:16px">
+      ${hasPhoto
+        ? `<img src="${ST.photos[sid]}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #1a2d45;margin-bottom:8px"/>`
+        : `<div style="width:100px;height:100px;border-radius:50%;background:${ME.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:38px;margin:0 auto 8px">${s.name[0].toUpperCase()}</div>`
+      }
+      <br>
+      <button class="btn" style="background:#111f35;border:1px solid #1a2d45;color:#e2e8f0;padding:7px 16px;font-size:12px" onclick="pickPhoto('${sid}')">
+        ${hasPhoto ? '🔄 Change Photo' : '📸 Add Photo'}
+      </button>
     </div>
     <div class="inset" style="margin-bottom:14px;font-size:13px;line-height:2">
       👨 Father: <b>${s.father||"—"}</b><br>📱 <b>${s.phone||"—"}</b><br>🏫 Batch: <b>${s.batch}</b>
@@ -415,7 +480,7 @@ function pageAtt(fs){
   const rows=fs.map(s=>{
     const v=(ST.attendance[s.id]||{})[day]||"",st=stats(s.id),pc=st.pct>=75?"#16a34a":"#dc2626";
     const alrt=v==="A"?`<a class="btn btn-wa" style="padding:8px 10px;font-size:14px" href="${wa(s.phone,msgAbsent(s))}" target="_blank">📱</a>`:"";
-    return `<div class="card flex g10"><div class="av" style="background:${ME.color}">${s.name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div><div style="font-size:11px;color:#4a6080;margin-top:2px">👨 ${s.father||"—"} • ${s.batch}</div><div style="font-size:10px;font-weight:700;color:${pc};margin-top:2px">${st.pct}% • P:${st.p} A:${st.a} L:${st.l}</div></div><div class="flex g6"><button class="sbtn" style="background:${SBG[v]};color:${STXT[v]}" onclick="toggleAtt('${s.id}')">${SLBL[v]}</button>${alrt}</div></div>`;
+    return `<div class="card flex g10">${avHtml(s.id,44,s.name,ME.color)}<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div><div style="font-size:11px;color:#4a6080;margin-top:2px">👨 ${s.father||"—"} • ${s.batch}</div><div style="font-size:10px;font-weight:700;color:${pc};margin-top:2px">${st.pct}% • P:${st.p} A:${st.a} L:${st.l}</div></div><div class="flex g6"><button class="sbtn" style="background:${SBG[v]};color:${STXT[v]}" onclick="toggleAtt('${s.id}')">${SLBL[v]}</button>${alrt}</div></div>`;
   }).join("");
   return `<div class="card"><div class="flex between wrap g8" style="margin-bottom:10px"><span style="font-weight:800;font-size:16px">📅 Day ${day}/30</span><div class="flex g6"><button class="btn" style="background:#16a34a;color:#fff;padding:6px 11px;font-size:11px" onclick="markAll('P')">All P</button><button class="btn" style="background:#dc2626;color:#fff;padding:6px 11px;font-size:11px" onclick="markAll('A')">All A</button><button class="btn" style="background:#d97706;color:#fff;padding:6px 11px;font-size:11px" onclick="markAll('L')">All L</button></div></div><div style="display:flex;flex-wrap:wrap;gap:5px">${dbtns}</div></div><div class="flex g8 wrap" style="margin-bottom:14px">${[["P","Present","#16a34a"],["A","Absent","#dc2626"],["L","Leave","#d97706"],["","Unmarked","#4a6080"]].map(([s,l,c])=>`<div class="chip"><div style="font-weight:900;font-size:22px;color:${c}">${sum[s]||0}</div><div style="font-size:10px;color:#4a6080">${l}</div></div>`).join("")}</div><input class="inp" style="margin-bottom:12px" placeholder="🔍 Search…" value="${ST.search}" oninput="ST.search=this.value;render()"/>${fs.length===0?`<div style="text-align:center;padding:44px;color:#4a6080">No students yet</div>`:rows}`;
 }
@@ -424,7 +489,7 @@ function pageStu(fs){
   const cards=fs.map(s=>{
     const st=stats(s.id),f=ST.fees[s.id]||{paid:0,total:ST.settings.feeTotal};
     const fp=Math.min(100,Math.round(f.paid/f.total*100)),fc=f.paid>=f.total?"#16a34a":f.paid>0?"#d97706":"#dc2626",pc=st.pct>=75?"#16a34a":"#dc2626";
-    return `<div class="card"><div class="flex g10" style="align-items:flex-start;margin-bottom:10px"><div class="av" style="width:46px;height:46px;font-size:19px;background:${ME.color}">${s.name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">${s.name}</div><div style="font-size:12px;color:#4a6080;margin-top:2px">👨 ${s.father||"—"} • 📱 ${s.phone||"—"}</div><div style="font-size:11px;color:#4a6080">🏫 ${s.batch}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-weight:900;font-size:21px;color:${pc}">${st.pct}%</div><div style="font-size:10px;color:#4a6080">P:${st.p} A:${st.a}</div></div></div><div class="pbar"><div class="pfill" style="width:${fp}%;background:${fc}"></div></div><div class="flex between" style="margin-bottom:10px"><span style="font-size:11px;color:${fc};font-weight:700">Fee: Rs.${f.paid}/${f.total}</span>${ST.notes[s.id]?`<span style="font-size:10px;color:#4a6080">📝</span>`:""}</div><div class="flex g8 wrap"><button class="btn btn-gray" style="flex:1;padding:8px" onclick="modalDetail('${s.id}')">📋 Detail</button><button class="btn btn-gray" style="flex:1;padding:8px" onclick="modalFee('${s.id}')">💰 Fee</button><a class="btn btn-wa" style="flex:1;padding:8px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 WA</a><a class="btn btn-amber" style="flex:1;padding:8px" href="${wa(s.phone,msgFee(s))}" target="_blank">💸 Fee</a></div></div>`;
+    return `<div class="card"><div class="flex g10" style="align-items:flex-start;margin-bottom:10px">${avHtml(s.id,46,s.name,ME.color)}<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">${s.name}</div><div style="font-size:12px;color:#4a6080;margin-top:2px">👨 ${s.father||"—"} • 📱 ${s.phone||"—"}</div><div style="font-size:11px;color:#4a6080">🏫 ${s.batch}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-weight:900;font-size:21px;color:${pc}">${st.pct}%</div><div style="font-size:10px;color:#4a6080">P:${st.p} A:${st.a}</div></div></div><div class="pbar"><div class="pfill" style="width:${fp}%;background:${fc}"></div></div><div class="flex between" style="margin-bottom:10px"><span style="font-size:11px;color:${fc};font-weight:700">Fee: Rs.${f.paid}/${f.total}</span>${ST.notes[s.id]?`<span style="font-size:10px;color:#4a6080">📝</span>`:""}</div><div class="flex g8 wrap"><button class="btn btn-gray" style="flex:1;padding:8px" onclick="modalDetail('${s.id}')">📋 Detail</button><button class="btn btn-gray" style="flex:1;padding:8px" onclick="modalFee('${s.id}')">💰 Fee</button><a class="btn btn-wa" style="flex:1;padding:8px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 WA</a><a class="btn btn-amber" style="flex:1;padding:8px" href="${wa(s.phone,msgFee(s))}" target="_blank">💸 Fee</a></div></div>`;
   }).join("");
   return `<div class="flex g8 wrap" style="margin-bottom:14px"><input class="inp" style="flex:1;min-width:130px;margin-bottom:0" placeholder="🔍 Search…" value="${ST.search}" oninput="ST.search=this.value;render()"/><select class="inp" style="width:auto;margin-bottom:0" onchange="ST.batch=this.value;render()">${["All","Morning","Evening"].map(b=>`<option${ST.batch===b?" selected":""}>${b}</option>`).join("")}</select><button class="btn btn-blue" style="white-space:nowrap;padding:11px 16px" onclick="modalAdd()">＋ Add</button></div>${fs.length===0?`<div style="text-align:center;padding:44px;color:#4a6080">No students yet.<br><br><button class="btn btn-blue" onclick="modalAdd()">＋ Add First Student</button></div>`:cards}`;
 }
@@ -433,7 +498,7 @@ function pageRep(){
   if(!ST.students.length)return`<div style="text-align:center;padding:44px;color:#4a6080">No students yet</div>`;
   return`<div style="font-weight:800;font-size:16px;margin-bottom:14px">📊 Weekly Reports</div>`+ST.students.map(s=>{
     const wbs=WEEKS.map((w,wi)=>{const a=ST.attendance[s.id]||{};let p=0,ab=0,l=0;w.d.forEach(d=>{if(a[d]==="P")p++;else if(a[d]==="A")ab++;else if(a[d]==="L")l++;});return `<a href="${wa(s.phone,msgWeek(s,wi))}" target="_blank" style="flex:1;min-width:78px;background:#111f35;border-radius:10px;padding:10px 8px;border:1px solid #1a2d45;text-align:center;text-decoration:none;color:#e2e8f0;display:block"><div style="font-weight:700;font-size:11px;color:#3b82f6">${w.l}</div><div style="font-size:10px;margin-top:4px;color:#4a6080">✅${p} ❌${ab} 🟡${l}</div><div style="font-size:9px;color:#25d366;margin-top:3px;font-weight:700">Send ↗</div></a>`;}).join("");
-    return `<div class="card"><div class="flex g10" style="margin-bottom:12px"><div class="av" style="width:40px;height:40px;font-size:16px;background:${ME.color}">${s.name[0].toUpperCase()}</div><div style="flex:1"><div style="font-weight:700">${s.name}</div><div style="font-size:11px;color:#4a6080">${s.father||"—"} • ${s.phone||"—"}</div></div><a class="btn btn-wa" style="padding:7px 12px;font-size:12px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 Full</a></div><div style="display:flex;gap:7px;flex-wrap:wrap">${wbs}</div></div>`;
+    return `<div class="card"><div class="flex g10" style="margin-bottom:12px">${avHtml(s.id,40,s.name,ME.color)}<div style="flex:1"><div style="font-weight:700">${s.name}</div><div style="font-size:11px;color:#4a6080">${s.father||"—"} • ${s.phone||"—"}</div></div><a class="btn btn-wa" style="padding:7px 12px;font-size:12px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 Full</a></div><div style="display:flex;gap:7px;flex-wrap:wrap">${wbs}</div></div>`;
   }).join("");
 }
 
@@ -511,6 +576,7 @@ async function preloadStudents() {
   console.log('✅ Students synced to Firebase');
   
   // Now pull so UI updates immediately after push
+  await loadPhotos();
   await pull();
 }
 
