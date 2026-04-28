@@ -3,914 +3,752 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>🎓 VacationPro</title>
+<title>VacationPro</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#060d18;color:#e2e8f0;min-height:100vh;padding-bottom:72px}
 input,select,textarea,button{font-family:inherit;outline:none}
-button{cursor:pointer}
-a{cursor:pointer}
 .card{background:#0d1b2e;border:1px solid #1a2d45;border-radius:14px;padding:16px;margin-bottom:12px}
-.inset{background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45}
-.btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;display:inline-block;text-align:center}
-.btn-blue{background:linear-gradient(135deg,#1d4ed8,#0284c7);color:#fff}
-.btn-red{background:#dc2626;color:#fff}
-.btn-gray{background:#111f35;border:1px solid #1a2d45;color:#e2e8f0}
-.btn-wa{background:#25d366;color:#fff;text-decoration:none}
-.btn-amber{background:#d97706;color:#fff;text-decoration:none}
+.btn{border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;display:inline-block;text-align:center;text-decoration:none}
+.blue{background:linear-gradient(135deg,#1d4ed8,#0284c7);color:#fff}
+.red{background:#dc2626;color:#fff}
+.gray{background:#111f35;border:1px solid #1a2d45;color:#e2e8f0}
+.wa{background:#25d366;color:#fff}
+.amber{background:#d97706;color:#fff}
 .inp{width:100%;padding:11px 13px;border-radius:10px;border:1px solid #1a2d45;background:#111f35;color:#e2e8f0;font-size:14px;margin-bottom:10px}
-textarea.inp{resize:vertical;min-height:65px}
-.flex{display:flex;align-items:center}
-.wrap{flex-wrap:wrap}
-.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}
-.between{justify-content:space-between}
-#topbar{background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 55%,#0284c7 100%);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 24px rgba(0,0,0,.5)}
-#bnav{position:fixed;bottom:0;left:0;right:0;background:#0d1b2e;border-top:1px solid #1a2d45;display:flex;z-index:50}
-.nb{flex:1;padding:9px 4px;border:none;background:transparent;color:#4a6080;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px;border-top:2px solid transparent;transition:color .2s,border-color .2s}
-.nb.on{color:#3b82f6;border-top-color:#3b82f6}
-.nb .ni{font-size:20px;line-height:1}
-.sbadge{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);border-radius:20px;padding:5px 11px}
-.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-.blinking{animation:blink .9s infinite}
-.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
-.daybtn{width:34px;height:34px;border-radius:8px;border:2px solid #1a2d45;background:#060d18;color:#4a6080;font-weight:700;font-size:12px}
-.daybtn.sel{border-color:#3b82f6;background:#3b82f6;color:#fff}
-.daybtn.mrkd{background:#111f35;color:#e2e8f0;border-color:#1e3a5f}
-.sbtn{min-width:90px;padding:9px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px}
 .pbar{height:7px;background:#111f35;border-radius:4px;overflow:hidden;margin:5px 0}
 .pfill{height:100%;border-radius:4px;transition:width .5s}
-.ccell{width:31px;height:31px;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;font-weight:700;border:1px solid rgba(255,255,255,.04)}
-.chip{flex:1;min-width:68px;background:#0d1b2e;border:1px solid #1a2d45;border-radius:10px;padding:10px 8px;text-align:center}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:flex-end;justify-content:center;z-index:200}
 .modal{background:#0d1b2e;border-radius:20px 20px 0 0;padding:22px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid #1a2d45}
-#toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);padding:11px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:300;box-shadow:0 4px 24px rgba(0,0,0,.5);display:none;white-space:nowrap}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#1e3a8a;border-radius:4px}
+#toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);padding:11px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:300;display:none;white-space:nowrap}
 #content{padding:14px;max-width:860px;margin:0 auto}
-.lowcard{background:#1a0808;border:1px solid #7f1d1d;border-radius:14px;padding:16px;margin-bottom:12px}
-.photo-av{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #1a2d45}
-.photo-av-lg{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #1a2d45;display:block;margin:0 auto 10px}
-.photo-upload-btn{background:#111f35;border:2px dashed #1a2d45;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
-.photo-upload-btn:hover{border-color:#3b82f6}
-
-/* LOGIN */
+#topbar{background:linear-gradient(135deg,#1e3a8a,#1d4ed8,#0284c7);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+#bnav{position:fixed;bottom:0;left:0;right:0;background:#0d1b2e;border-top:1px solid #1a2d45;display:flex;z-index:50}
+.nb{flex:1;padding:9px 4px;border:none;background:transparent;color:#4a6080;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px;border-top:2px solid transparent}
+.nb.on{color:#3b82f6;border-top-color:#3b82f6}
 #loginscreen{position:fixed;inset:0;background:#060d18;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .lbox{background:#0d1b2e;border:1px solid #1a2d45;border-radius:20px;padding:24px;width:100%;max-width:420px}
-.tcard{background:#111f35;border:2px solid #1a2d45;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s}
+.tcard{background:#111f35;border:2px solid #1a2d45;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer}
 .tcard.picked{border-color:#3b82f6;background:#0d1b2e}
-.tav{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px;flex-shrink:0}
+.av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
+.daybtn{width:34px;height:34px;border-radius:8px;border:2px solid #1a2d45;background:#060d18;color:#4a6080;font-weight:700;font-size:12px;cursor:pointer}
+.daybtn.sel{border-color:#3b82f6;background:#3b82f6;color:#fff}
+.daybtn.mrkd{background:#111f35;color:#e2e8f0;border-color:#1e3a5f}
+.chip{flex:1;min-width:68px;background:#0d1b2e;border:1px solid #1a2d45;border-radius:10px;padding:10px 8px;text-align:center}
+.ccell{width:31px;height:31px;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;font-weight:700}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.blinking{animation:blink .9s infinite}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:#1e3a8a;border-radius:4px}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
 <div id="loginscreen">
   <div style="text-align:center;margin-bottom:24px">
-    <div style="font-size:50px;margin-bottom:8px">🎓</div>
-    <div style="font-size:22px;font-weight:900;color:#fff">VacationPro</div>
+    <div style="font-size:52px;margin-bottom:8px">&#127891;</div>
+    <div style="font-size:24px;font-weight:900;color:#fff">VacationPro</div>
     <div style="font-size:13px;color:#4a6080;margin-top:5px">Select your name to login</div>
   </div>
   <div class="lbox">
-    <div style="font-size:12px;color:#4a6080;font-weight:700;margin-bottom:12px;text-align:center">👆 TAP YOUR NAME</div>
+    <div style="font-size:12px;color:#4a6080;font-weight:700;margin-bottom:12px;text-align:center">TAP YOUR NAME</div>
     <div id="tlist"></div>
     <div style="border-top:1px solid #1a2d45;margin-top:14px;padding-top:14px">
-      <div style="font-size:12px;color:#4a6080;font-weight:600;margin-bottom:8px">🔐 Your PIN</div>
+      <div style="font-size:12px;color:#4a6080;font-weight:600;margin-bottom:8px">Your PIN</div>
       <input class="inp" id="pinbox" type="password" inputmode="numeric" maxlength="4"
-        placeholder="Enter 4-digit PIN"
-        style="letter-spacing:10px;font-size:22px;text-align:center;margin-bottom:10px"
-        onkeydown="if(event.key==='Enter')loginNow()"/>
-      <button class="btn btn-blue" style="width:100%;padding:13px;font-size:15px" onclick="loginNow()">✅ Login</button>
+        placeholder="4-digit PIN" style="letter-spacing:10px;font-size:22px;text-align:center;margin-bottom:10px"/>
+      <button class="btn blue" style="width:100%;padding:13px;font-size:15px" id="loginbtn">Login</button>
     </div>
   </div>
 </div>
 
-<!-- ══ TOPBAR ══ -->
 <div id="topbar" style="display:none">
-  <div style="min-width:0">
-    <div style="font-size:17px;font-weight:900;color:#fff">🎓 VacationPro</div>
-    <div id="cname" style="font-size:10px;color:rgba(255,255,255,.6);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">Loading…</div>
+  <div>
+    <div style="font-size:17px;font-weight:900;color:#fff">VacationPro</div>
+    <div id="cname" style="font-size:10px;color:rgba(255,255,255,.6);margin-top:1px"></div>
   </div>
-  <div class="flex g8">
-    <div class="sbadge">
-      <span class="sdot" id="sdot"></span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.35);border-radius:20px;padding:5px 11px">
+      <span class="sdot" id="sdot" style="background:#4b5563"></span>
       <span id="slbl" style="font-size:10px;color:rgba(255,255,255,.85);font-weight:700">OFFLINE</span>
     </div>
-    <button onclick="logout()" style="background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:5px 10px;color:#fff;font-size:11px;font-weight:700">🚪</button>
+    <button id="logoutbtn" style="background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:5px 10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">Exit</button>
   </div>
 </div>
 
-<div id="content"></div>
+<div id="content" style="display:none"></div>
 
-<!-- ══ BOTTOM NAV ══ -->
 <div id="bnav" style="display:none">
-  <button class="nb on" id="nb-attendance" onclick="go('attendance')"><span class="ni">📋</span><span>Attendance</span></button>
-  <button class="nb"    id="nb-students"   onclick="go('students')">  <span class="ni">👥</span><span>Students</span></button>
-  <button class="nb"    id="nb-reports"    onclick="go('reports')">   <span class="ni">📊</span><span>Reports</span></button>
-  <button class="nb"    id="nb-analysis"   onclick="go('analysis')">  <span class="ni">📈</span><span>Analysis</span></button>
-  <button class="nb"    id="nb-settings"   onclick="go('settings')">  <span class="ni">⚙️</span><span>Settings</span></button>
+  <button class="nb on" id="nb-attendance"><span style="font-size:20px">&#128203;</span><span>Attendance</span></button>
+  <button class="nb" id="nb-students"><span style="font-size:20px">&#128101;</span><span>Students</span></button>
+  <button class="nb" id="nb-reports"><span style="font-size:20px">&#128202;</span><span>Reports</span></button>
+  <button class="nb" id="nb-analysis"><span style="font-size:20px">&#128200;</span><span>Analysis</span></button>
+  <button class="nb" id="nb-settings"><span style="font-size:20px">&#9881;</span><span>Settings</span></button>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ╔══════════════════════════════════════════════╗
-// ║  👨‍🏫 TEACHERS — Add/Edit/Remove here         ║
-// ║  Each teacher has SEPARATE data in Firebase  ║
-// ╚══════════════════════════════════════════════╝
-const TEACHERS = [
-  // 🟦 Khan Sir = Grade B students (vacationpro path)
-  { id:"khan",   name:"Khan Sir",    subject:"Grade B",  pin:"8281", color:"#1d4ed8", dbPath:"vacationpro" },
-  // 🟩 Other Teachers = Grade A students (gradeA path)
-  { id:"nadeem", name:"Nadeem sir",  subject:"Grade A",  pin:"2526", color:"#16a34a", dbPath:"gradeA" },
+var TEACHERS = [
+  {id:"khan",   name:"Khan Sir",   subject:"Grade B", pin:"8281", color:"#1d4ed8", db:"vacationpro"},
+  {id:"nadeem", name:"Nadeem Sir", subject:"Grade A", pin:"2526", color:"#16a34a", db:"gradeA"}
 ];
+var FB = "https://vacation-course-default-rtdb.firebaseio.com";
+var H  = {"Content-Type":"application/json"};
+function fget(p){return fetch(FB+"/"+p+".json").then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+function fset(p,d){return fetch(FB+"/"+p+".json",{method:"PUT",headers:H,body:JSON.stringify(d)}).catch(function(){});}
+function fpatch(p,d){return fetch(FB+"/"+p+".json",{method:"PATCH",headers:H,body:JSON.stringify(d)}).catch(function(){});}
 
-// 🔥 Firebase — your vacation-course project
-const FB  = "https://vacation-course-default-rtdb.firebaseio.com";
-const HDR = {"Content-Type":"application/json"};
-const $fb = {
-  async get(p)    { try{ const r=await fetch(`${FB}/${p}.json`); return r.ok?r.json():null; }catch{return null;} },
-  async set(p,d)  { try{ await fetch(`${FB}/${p}.json`,{method:"PUT",  headers:HDR,body:JSON.stringify(d)}); }catch{} },
-  async patch(p,d){ try{ await fetch(`${FB}/${p}.json`,{method:"PATCH",headers:HDR,body:JSON.stringify(d)}); }catch{} },
-};
+var ME=null, DB="", syncT=null, picked=null;
+var ST={tab:"attendance",students:[],att:{},notes:{},fees:{},photos:{},deleted:{},
+  cfg:{name:"Vacation Course 2025",teacher:"",fee:3000},
+  day:1,sync:"idle",search:"",batch:"All",rv:"sheet"};
+var DAYS=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+var WEEKS=[{l:"Week 1",d:[1,2,3,4,5,6,7]},{l:"Week 2",d:[8,9,10,11,12,13,14]},
+  {l:"Week 3",d:[15,16,17,18,19,20,21]},{l:"Week 4",d:[22,23,24,25,26,27,28]},{l:"Week 5",d:[29,30]}];
+var SN={"":"P","P":"A","A":"L","L":"P"};
+var SL={P:"Present",A:"Absent",L:"Leave","":"Mark"};
+var SBG={P:"#16a34a",A:"#dc2626",L:"#d97706","":"#111f35"};
+var STC={P:"#fff",A:"#fff",L:"#fff","":"#4a6080"};
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 
-// ── State ──────────────────────────────────────
-let ME = null;   // logged-in teacher
-let DB = "";     // Firebase path e.g. "teachers/khan"
-
-const ST = {
-  tab:"attendance", students:[], attendance:{}, notes:{}, fees:{}, photos:{}, deleted:{},
-  settings:{courseName:"Vacation Course 2025",teacher:"",feeTotal:3000},
-  day:1, sync:"idle", lastSync:null, search:"", batch:"All"
-};
-
-const DAYS=[...Array(30)].map((_,i)=>i+1);
-const WEEKS=[{l:"Week 1",d:[1,2,3,4,5,6,7]},{l:"Week 2",d:[8,9,10,11,12,13,14]},{l:"Week 3",d:[15,16,17,18,19,20,21]},{l:"Week 4",d:[22,23,24,25,26,27,28]},{l:"Week 5",d:[29,30]}];
-const SNXT={"":"P",P:"A",A:"L",L:"P"};
-const SLBL={P:"Present",A:"Absent",L:"Leave","":"Mark"};
-const SBG={P:"#16a34a",A:"#dc2626",L:"#d97706","":"#111f35"};
-const STXT={P:"#fff",A:"#fff",L:"#fff","":"#4a6080"};
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-
-// Returns either <img> with photo or colored initial div
-function avHtml(sid, size=44, name="?", color="#1d4ed8"){
-  const photo = ST.photos[sid];
-  if(photo){
-    return `<img src="${photo}" class="photo-av" style="width:${size}px;height:${size}px" onerror="this.style.display='none'"/>`;
-  }
-  return `<div class="av" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.4)}px;background:${color}">${(name||"?")[0].toUpperCase()}</div>`;
-}
-
-// Compress image to base64 small enough for Firebase (max ~80KB)
-function compressPhoto(file, cb){
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const MAX = 200; // px
-      let w=img.width, h=img.height;
-      if(w>h){ if(w>MAX){h=h*MAX/w;w=MAX;} } else { if(h>MAX){w=w*MAX/h;h=MAX;} }
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      cb(canvas.toDataURL('image/jpeg', 0.7));
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function pickPhoto(sid){
-  const inp = document.createElement('input');
-  inp.type='file'; inp.accept='image/*'; inp.capture='environment';
-  inp.onchange = e => {
-    const file = e.target.files[0];
-    if(!file) return;
-    compressPhoto(file, async (b64)=>{
-      await pushPhoto(sid, b64);
-      render();
-      // refresh modal if open
-      const mo = document.getElementById('moverlay');
-      if(mo) modalDetail(sid);
-      toast('📸 Photo saved!');
-    });
-  };
-  inp.click();
-}
-
-// ── Login ──────────────────────────────────────
-let picked = null;
-
+// ── LOGIN ──────────────────────────────────────
 function buildLogin(){
-  const tlist = document.getElementById("tlist");
-  if(!tlist){ setTimeout(buildLogin, 100); return; }
-  tlist.innerHTML = "";
+  var tlist=document.getElementById("tlist");
+  tlist.innerHTML="";
   TEACHERS.forEach(function(t){
-    const div = document.createElement("div");
-    div.className = "tcard";
-    div.id = "tc-"+t.id;
-    div.innerHTML =
-      '<div style="width:46px;height:46px;border-radius:50%;background:'+t.color+';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px;flex-shrink:0">'+t.name[0]+'</div>'+
-      '<div style="flex:1;margin-left:12px">'+
-        '<div style="font-weight:700;font-size:15px">'+t.name+'</div>'+
-        '<div style="font-size:12px;color:#4a6080;margin-top:2px">📚 '+t.subject+'</div>'+
-      '</div>'+
-      '<span id="ck-'+t.id+'" style="font-size:20px"></span>';
-    div.onclick = function(){ pickTeacher(t.id); };
-    tlist.appendChild(div);
+    var d=document.createElement("div");
+    d.className="tcard"; d.id="tc-"+t.id;
+    var av=document.createElement("div");
+    av.className="av"; av.style.background=t.color;
+    av.textContent=t.name[0];
+    var info=document.createElement("div"); info.style.flex="1"; info.style.marginLeft="12px";
+    var n=document.createElement("div"); n.style.fontWeight="700"; n.style.fontSize="15px"; n.textContent=t.name;
+    var s=document.createElement("div"); s.style.fontSize="12px"; s.style.color="#4a6080"; s.style.marginTop="2px"; s.textContent=t.subject;
+    var ck=document.createElement("span"); ck.id="ck-"+t.id; ck.style.fontSize="20px";
+    info.appendChild(n); info.appendChild(s);
+    d.appendChild(av); d.appendChild(info); d.appendChild(ck);
+    d.addEventListener("click",(function(tc){return function(){pickT(tc.id);};})(t));
+    tlist.appendChild(d);
   });
 }
 
-function pickTeacher(id){
-  picked = TEACHERS.find(t=>t.id===id);
-  document.querySelectorAll(".tcard").forEach(c=>c.classList.remove("picked"));
-  document.querySelectorAll("[id^='ck-']").forEach(c=>c.textContent="");
-  document.getElementById("tc-"+id).classList.add("picked");
-  document.getElementById("ck-"+id).textContent="✅";
+function pickT(id){
+  picked=null;
+  for(var i=0;i<TEACHERS.length;i++) if(TEACHERS[i].id===id){picked=TEACHERS[i];break;}
+  document.querySelectorAll(".tcard").forEach(function(c){c.classList.remove("picked");});
+  document.querySelectorAll("[id^='ck-']").forEach(function(c){c.textContent="";});
+  var el=document.getElementById("tc-"+id); if(el) el.classList.add("picked");
+  var ck=document.getElementById("ck-"+id); if(ck) ck.textContent="✅";
   document.getElementById("pinbox").value="";
   document.getElementById("pinbox").focus();
 }
 
-function loginNow(){
-  if(!picked){ toast("Tap your name first!",true); return; }
-  const pin=document.getElementById("pinbox").value.trim();
-  if(pin!==picked.pin){ toast("Wrong PIN ❌ Try again",true); document.getElementById("pinbox").value=""; return; }
-  ME=picked; DB=ME.dbPath||"vacationpro"; // Each teacher uses their grade path
-  ST.settings.teacher=ME.name;
+function doLogin(){
+  if(!picked){toast("Tap your name first",true);return;}
+  var pin=document.getElementById("pinbox").value.trim();
+  if(pin!==picked.pin){toast("Wrong PIN",true);document.getElementById("pinbox").value="";return;}
+  ME=picked; DB=ME.db; ST.cfg.teacher=ME.name;
   document.getElementById("loginscreen").style.display="none";
   document.getElementById("topbar").style.display="flex";
   document.getElementById("bnav").style.display="flex";
-  document.getElementById("content").innerHTML=`<div style="text-align:center;padding:60px 20px;color:#4a6080"><div style="font-size:40px;margin-bottom:14px">⏳</div><div style="font-weight:700;font-size:16px">Loading students...</div><div style="font-size:12px;margin-top:8px">Syncing from Firebase</div></div>`;
-  // preload pushes Excel data, then pulls — then start heartbeat
-  preloadStudents().then(()=>{
-    startSync();
-  });
-  toast(`Welcome ${ME.name}! 👋`);
+  document.getElementById("content").style.display="block";
+  document.getElementById("content").innerHTML='<div style="text-align:center;padding:60px 20px;color:#4a6080"><div style="font-size:40px;margin-bottom:14px">&#9203;</div><div style="font-weight:700">Loading students...</div></div>';
+  preload().then(function(){startSync();});
+  toast("Welcome "+ME.name+"!");
 }
 
-function logout(){
-  if(!confirm("Logout?")) return;
-  clearInterval(syncT);
-  ME=null; DB="";
-  Object.assign(ST,{tab:"attendance",students:[],attendance:{},notes:{},fees:{},settings:{courseName:"Vacation Course 2025",teacher:"",feeTotal:3000},day:1,sync:"idle",lastSync:null,search:"",batch:"All"});
-  picked=null;
+function doLogout(){
+  if(!confirm("Logout?"))return;
+  clearInterval(syncT); ME=null; DB=""; picked=null;
+  ST={tab:"attendance",students:[],att:{},notes:{},fees:{},photos:{},deleted:{},cfg:{name:"Vacation Course 2025",teacher:"",fee:3000},day:1,sync:"idle",search:"",batch:"All",rv:"sheet"};
   document.getElementById("loginscreen").style.display="flex";
   document.getElementById("topbar").style.display="none";
   document.getElementById("bnav").style.display="none";
+  document.getElementById("content").style.display="none";
   document.getElementById("content").innerHTML="";
   document.getElementById("pinbox").value="";
-  document.querySelectorAll(".tcard").forEach(c=>c.classList.remove("picked"));
-  document.querySelectorAll("[id^='ck-']").forEach(c=>c.textContent="");
+  document.querySelectorAll(".tcard").forEach(function(c){c.classList.remove("picked");});
+  document.querySelectorAll("[id^='ck-']").forEach(function(c){c.textContent="";});
 }
 
-// ── Firebase Sync ──────────────────────────────
-let syncT=null;
+// ── FIREBASE ───────────────────────────────────
+function startSync(){pull();syncT=setInterval(pull,8000);}
 
-function startSync(){ pull(); syncT=setInterval(pull,8000); }
-
-async function pull(){
-  if(!DB) return;
+function pull(){
+  if(!DB)return;
   dot("syncing");
-  try{
-    const data=await $fb.get(DB);
+  fget(DB).then(function(data){
     if(data){
-      if(data.students){ const m={}; Object.values(data.students).forEach(s=>{if(s&&s.id)m[s.id]=s;}); ST.students=Object.values(m); }
-      if(data.attendance) ST.attendance=data.attendance;
-      if(data.notes)      ST.notes=data.notes;
-      if(data.fees)       ST.fees=data.fees;
-      if(data.settings)   ST.settings={...ST.settings,...data.settings};
+      if(data.students){var m={};Object.values(data.students).forEach(function(s){if(s&&s.id)m[s.id]=s;});ST.students=Object.values(m);}
+      if(data.att) Object.assign(ST.att,data.att);
+      if(data.notes) Object.assign(ST.notes,data.notes);
+      if(data.fees) Object.assign(ST.fees,data.fees);
+      if(data.photos) Object.assign(ST.photos,data.photos);
+      if(data.deleted) Object.assign(ST.deleted,data.deleted);
+      if(data.cfg) ST.cfg=Object.assign({},ST.cfg,data.cfg);
     }
-    if(data.photos)  Object.assign(ST.photos,  data.photos);
-    if(data.deleted) Object.assign(ST.deleted, data.deleted);
-    dot("live"); ST.lastSync=new Date(); render();
-  }catch{ dot("error"); }
+    dot("live"); render();
+  }).catch(function(){dot("error");});
 }
 
 function dot(s){
   ST.sync=s;
-  const d=document.getElementById("sdot"),l=document.getElementById("slbl");
+  var d=document.getElementById("sdot"),l=document.getElementById("slbl");
   if(!d)return;
   d.style.background=s==="live"?"#22c55e":s==="syncing"?"#f59e0b":s==="error"?"#ef4444":"#4b5563";
   d.className="sdot"+(s==="syncing"?" blinking":"");
-  l.textContent=s==="live"?"LIVE":s==="syncing"?"SYNC…":s==="error"?"ERROR":"OFFLINE";
+  l.textContent=s==="live"?"LIVE":s==="syncing"?"SYNC":"ERROR";
 }
 
-const pushS =async()=>{ const o={}; ST.students.forEach(s=>o[s.id]=s); await $fb.set(`${DB}/students`,o); };
-const pushDeleted=async()=> $fb.set(`${DB}/deleted`,ST.deleted);
-const pushA =async()=> $fb.set(`${DB}/attendance`,ST.attendance);
-const pushN =async()=> $fb.set(`${DB}/notes`,ST.notes);
-const pushF =async()=> $fb.set(`${DB}/fees`,ST.fees);
-const pushSt=async()=> $fb.patch(`${DB}/settings`,ST.settings);
-const pushPhoto=async(sid,b64)=>{ await $fb.set(`${DB}/photos/${sid}`,b64); ST.photos[sid]=b64; };
-const loadPhotos=async()=>{ const p=await $fb.get(`${DB}/photos`); if(p){ Object.assign(ST.photos,p); } };
+function pS(){var o={};ST.students.forEach(function(s){o[s.id]=s;});return fset(DB+"/students",o);}
+function pA(){return fset(DB+"/att",ST.att);}
+function pN(){return fset(DB+"/notes",ST.notes);}
+function pF(){return fset(DB+"/fees",ST.fees);}
+function pC(){return fpatch(DB+"/cfg",ST.cfg);}
+function pD(){return fset(DB+"/deleted",ST.deleted);}
+function pPh(sid,b64){ST.photos[sid]=b64;return fset(DB+"/photos/"+sid,b64);}
 
-// ── Helpers ────────────────────────────────────
+function preload(){
+  return Promise.all([fget("vacationpro/deleted"),fget("gradeA/deleted"),fget("vacationpro/students"),fget("gradeA/students")])
+  .then(function(r){
+    var dB=r[0]||{},dA=r[1]||{},eB=r[2]||{},eA=r[3]||{};
+    var mB=Object.assign({},eB);
+    GB.forEach(function(s){if(!dB[s.id])mB[s.id]=s;});
+    var mA=Object.assign({},eA);
+    GA.forEach(function(s){if(!dA[s.id])mA[s.id]=s;});
+    return Promise.all([fset("vacationpro/students",mB),fset("gradeA/students",mA)]);
+  });
+}
+
+// ── HELPERS ────────────────────────────────────
 function stats(sid){
-  const a=ST.attendance[sid]||{}; let p=0,ab=0,l=0;
-  Object.values(a).forEach(v=>{if(v==="P")p++;else if(v==="A")ab++;else if(v==="L")l++;});
-  const t=p+ab+l; return {p,a:ab,l,t,pct:t?Math.round(p/t*100):0};
+  var a=ST.att[sid]||{},p=0,ab=0,l=0;
+  Object.values(a).forEach(function(v){if(v==="P")p++;else if(v==="A")ab++;else if(v==="L")l++;});
+  var t=p+ab+l; return {p:p,a:ab,l:l,t:t,pct:t?Math.round(p/t*100):0};
 }
 
-function wa(phone,msg){
-  if(!phone||!phone.trim()) return "#";
-  let c = phone.replace(/\D/g,""); // strip all non-digits
-
-  // ── Already has full country code ──────────────────────────
-  // Indian: 91 + 10 digits = 12 digits starting with 91
-  if(c.startsWith("91") && c.length===12){ /* good */ }
-  // Pakistani: 92 + 10 digits = 12 digits starting with 92
-  else if(c.startsWith("92") && c.length===12){ /* good */ }
-
-  // ── Indian local formats ────────────────────────────────────
-  // 10 digits starting with 6,7,8,9 = Indian mobile
-  else if(c.length===10 && /^[6-9]/.test(c)){ c="91"+c; }
-
-  // ── Pakistani local formats ─────────────────────────────────
-  // Starts with 0 + 10 digits = 0XXXXXXXXXX (Pakistani local)
-  else if(c.startsWith("0") && c.length===11 && c[1]==="3"){ c="92"+c.slice(1); }
-  // Starts with 3 + 9 digits = 3XXXXXXXXX
-  else if(c.startsWith("3") && c.length===10){ c="92"+c; }
-
-  // ── Fallback: assume Indian ─────────────────────────────────
-  else { c="91"+c.replace(/^0+/,""); }
-
-  return `https://wa.me/${c}?text=${encodeURIComponent(msg)}`;
+function waLink(phone,msg){
+  if(!phone||!phone.trim())return "#";
+  var c=phone.replace(/\D/g,"");
+  if(c.startsWith("91")&&c.length===12){}
+  else if(c.startsWith("92")&&c.length===12){}
+  else if(c.length===10&&/^[6-9]/.test(c))c="91"+c;
+  else if(c.startsWith("0")&&c.length===11&&c[1]==="3")c="92"+c.slice(1);
+  else if(c.startsWith("3")&&c.length===10)c="92"+c;
+  else c="91"+c.replace(/^0+/,"");
+  return "https://wa.me/"+c+"?text="+encodeURIComponent(msg);
 }
 
-// Helper: detect country flag for display
-function phoneFlag(phone){
-  const c=phone.replace(/\D/g,"");
-  if(c.startsWith("92")||(c.startsWith("0")&&c[1]==="3")||(c.startsWith("3")&&c.length===10)) return "🇵🇰";
-  if(c.startsWith("91")||(c.length===10&&/^[6-9]/.test(c))) return "🇮🇳";
-  return "📱";
+function avHtml(sid,sz,name,color){
+  var ph=ST.photos[sid];
+  if(ph)return '<img src="'+ph+'" style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #1a2d45"/>';
+  return '<div class="av" style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.round(sz*.4)+'px;background:'+color+'">'+((name||"?")[0].toUpperCase())+'</div>';
 }
 
-function filtered(){
-  return ST.students.filter(s=>{
-    const q=ST.search.toLowerCase();
+function filt(){
+  return ST.students.filter(function(s){
+    var q=ST.search.toLowerCase();
     return (ST.batch==="All"||s.batch===ST.batch)&&
       (s.name.toLowerCase().includes(q)||(s.father||"").toLowerCase().includes(q)||(s.phone||"").includes(q));
   });
 }
 
-function toast(msg,err=false){
-  const t=document.getElementById("toast");
-  t.textContent=msg; t.style.background=err?"#dc2626":"#16a34a"; t.style.display="block";
-  clearTimeout(t._t); t._t=setTimeout(()=>t.style.display="none",3000);
+function toast(msg,err){
+  var t=document.getElementById("toast");
+  t.textContent=msg;t.style.background=err?"#dc2626":"#16a34a";t.style.display="block";
+  clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},3000);
 }
 
-// WA messages
-const tname=()=>ME?.name||"";
-function msgFull(s){
-  const st=stats(s.id),a=ST.attendance[s.id]||{},abs=DAYS.filter(d=>a[d]==="A"),fee=ST.fees[s.id]||{paid:0,total:ST.settings.feeTotal},note=ST.notes[s.id]||"";
-  return `📚 *${ST.settings.courseName}*\n*30-Day Full Report*\n\n👤 Student: *${s.name}*\n👨 Father: ${s.father||"—"}\n📱 ${s.phone||"—"}\n🏫 Batch: ${s.batch}\n👨‍🏫 Teacher: ${tname()}\n\n📊 *Attendance:*\n✅ Present: ${st.p} days\n❌ Absent: ${st.a} days\n🟡 Leave: ${st.l} days\n📈 Rate: *${st.pct}%*\n`+(abs.length?`\n⚠️ Absent on days: ${abs.join(", ")}\n`:"")+`\n💰 *Fee:* Rs.${fee.paid} / Rs.${fee.total}\n`+(note?`\n📝 Note: ${note}\n`:"")+`\n_${tname()} | ${ST.settings.courseName}_`;
-}
-function msgWeek(s,wi){
-  const w=WEEKS[wi],a=ST.attendance[s.id]||{};let p=0,ab=0,l=0;
-  const lines=w.d.map(d=>{const v=a[d]||"";if(v==="P")p++;else if(v==="A")ab++;else if(v==="L")l++;return `Day ${String(d).padStart(2,"0")}: ${v?SLBL[v]:"Not Marked"}`;}).join("\n");
-  return `📚 *${ST.settings.courseName}*\n*${w.l} Report*\n\n👤 *${s.name}* | Father: ${s.father||"—"}\n👨‍🏫 ${tname()}\n\n✅ Present: ${p}  ❌ Absent: ${ab}  🟡 Leave: ${l}\n\n📋 Day-wise:\n${lines}\n\n_${tname()}_`;
-}
-function msgAbsent(s){ return `⚠️ *Absence Alert — ${ST.settings.courseName}*\n\nDear ${s.father||"Parent"} Sb,\n\n*${s.name}* was Absent on Day ${ST.day}.\n\nKindly ensure regular attendance.\n\n_${tname()}_`; }
-function msgLow(s){ const st=stats(s.id); return `⚠️ *Low Attendance Warning*\n\nDear ${s.father||"Parent"} Sb,\n\n*${s.name}* has only *${st.pct}%* attendance.\nPresent: ${st.p} | Absent: ${st.a}\n\nPlease ensure regular attendance.\n\n_${tname()}_`; }
-function msgFee(s){ const f=ST.fees[s.id]||{paid:0,total:ST.settings.feeTotal}; return `💰 *Fee Reminder — ${ST.settings.courseName}*\n\nDear ${s.father||"Parent"} Sb,\n\n*${s.name}*\nTotal: Rs.${f.total} | Paid: Rs.${f.paid}\n⚠️ Due: *Rs.${f.total-f.paid}*\n\nKindly clear dues.\n\n_${tname()}_`; }
+function tname(){return ME?ME.name:ST.cfg.teacher;}
 
-// ── Actions ────────────────────────────────────
-async function toggleAtt(sid){
-  if(!ST.attendance[sid])ST.attendance[sid]={};
-  ST.attendance[sid][ST.day]=SNXT[ST.attendance[sid][ST.day]||""];
-  dot("syncing");render();await pushA();dot("live");ST.lastSync=new Date();
+// WA messages - using array join to avoid newline issues
+function mFull(s){
+  var st=stats(s.id),a=ST.att[s.id]||{},fee=ST.fees[s.id]||{paid:0,total:ST.cfg.fee},note=ST.notes[s.id]||"";
+  var abs=DAYS.filter(function(d){return a[d]==="A";});
+  var lines=["*"+ST.cfg.name+"*","*30-Day Full Report*","",
+    "Student: *"+s.name+"*","Father: "+(s.father||"-"),"Phone: "+(s.phone||"-"),"Batch: "+s.batch,"Teacher: "+tname(),"",
+    "ATTENDANCE:","Present: "+st.p+" days","Absent: "+st.a+" days","Leave: "+st.l+" days","Rate: *"+st.pct+"%*"];
+  if(abs.length)lines.push("","Absent on days: "+abs.join(", "));
+  lines.push("","Fee: Rs."+fee.paid+" / Rs."+fee.total);
+  if(note)lines.push("","Note: "+note);
+  lines.push("","_"+tname()+" | "+ST.cfg.name+"_");
+  return lines.join("\n");
 }
-async function markAll(status){
-  filtered().forEach(s=>{if(!ST.attendance[s.id])ST.attendance[s.id]={};ST.attendance[s.id][ST.day]=status;});
-  render();await pushA();toast(`All marked ${SLBL[status]} — Day ${ST.day}`);
+
+function mWeek(s,wi){
+  var w=WEEKS[wi],a=ST.att[s.id]||{},p=0,ab=0,l=0;
+  var dl=w.d.map(function(d){var v=a[d]||"";if(v==="P")p++;else if(v==="A")ab++;else if(v==="L")l++;return "Day "+String(d).padStart(2,"0")+": "+(v?SL[v]:"Not Marked");});
+  return [w.l+" Report","","Student: *"+s.name+"*","Father: "+(s.father||"-"),"Teacher: "+tname(),"",
+    "Present: "+p+"   Absent: "+ab+"   Leave: "+l,"","Day-wise:",dl.join("\n"),"","_"+tname()+"_"].join("\n");
 }
-async function addStudent(name,father,phone,batch){
+
+function mAbsent(s){
+  return ["Absence Alert - "+ST.cfg.name,"","Dear "+(s.father||"Parent")+" Sb,","",
+    s.name+" was Absent on Day "+ST.day+".","","Kindly ensure regular attendance.","","_"+tname()+"_"].join("\n");
+}
+
+function mLow(s){
+  var st=stats(s.id);
+  return ["Low Attendance Warning","","Dear "+(s.father||"Parent")+" Sb,","",
+    s.name+" has only "+st.pct+"% attendance.","Present: "+st.p+" | Absent: "+st.a,"","_"+tname()+"_"].join("\n");
+}
+
+function mFee(s){
+  var f=ST.fees[s.id]||{paid:0,total:ST.cfg.fee};
+  return ["Fee Reminder - "+ST.cfg.name,"","Dear "+(s.father||"Parent")+" Sb,","",
+    "Student: "+s.name,"Total: Rs."+f.total+" | Paid: Rs."+f.paid,"Due: Rs."+(f.total-f.paid),"","Kindly clear dues.","","_"+tname()+"_"].join("\n");
+}
+
+// ── ACTIONS ────────────────────────────────────
+function toggleAtt(sid){
+  if(!ST.att[sid])ST.att[sid]={};
+  ST.att[sid][ST.day]=SN[ST.att[sid][ST.day]||""];
+  dot("syncing");render();pA().then(function(){dot("live");});
+}
+
+function markAll(status){
+  filt().forEach(function(s){if(!ST.att[s.id])ST.att[s.id]={};ST.att[s.id][ST.day]=status;});
+  render();pA().then(function(){toast("All marked "+SL[status]+" - Day "+ST.day);});
+}
+
+function addStudent(name,father,phone,batch){
   if(!name.trim()){toast("Enter student name",true);return;}
-  if(ST.students.find(s=>s.name.toLowerCase()===name.trim().toLowerCase())){toast("Already exists!",true);closeModal();return;}
-  const ns={id:uid(),name:name.trim(),father:(father||"").trim(),phone:(phone||"").trim(),batch:batch||"Morning"};
-  ST.students.push(ns);closeModal();render();await pushS();toast(`${ns.name} added ✅`);
+  if(ST.students.find(function(s){return s.name.toLowerCase()===name.trim().toLowerCase();})){toast("Already exists",true);closeModal();return;}
+  var ns={id:uid(),name:name.trim(),father:(father||"").trim(),phone:(phone||"").trim(),batch:batch||"Morning"};
+  ST.students.push(ns);closeModal();render();pS().then(function(){toast(ns.name+" added");});
 }
-async function delStudent(sid){
-  if(!confirm("Remove this student?")) return;
-  ST.deleted[sid] = true;
-  ST.students = ST.students.filter(s=>s.id!==sid);
-  delete ST.attendance[sid];
-  delete ST.notes[sid];
-  delete ST.fees[sid];
-  closeModal();
-  render();
-  await pushDeleted();
-  await pushS();
-  await pushA();
-  toast("Student removed ✅", true);
-}
-async function saveFee(sid,paid){ST.fees[sid]={paid:Number(paid),total:ST.settings.feeTotal};closeModal();render();await pushF();toast("Fee saved ✅");}
-async function saveNote(sid,note){ST.notes[sid]=note;await pushN();toast("Note saved ✅");}
-async function saveSettings(cn,tc,ft){ST.settings={courseName:cn,teacher:tc,feeTotal:Number(ft)};document.getElementById("cname").textContent=`${tname()} — ${cn}`;render();await pushSt();toast("Saved ✅");}
 
-// ── Navigation ─────────────────────────────────
+function delStudent(sid){
+  if(!confirm("Remove this student?"))return;
+  ST.deleted[sid]=true;
+  ST.students=ST.students.filter(function(s){return s.id!==sid;});
+  delete ST.att[sid];delete ST.notes[sid];delete ST.fees[sid];
+  closeModal();render();
+  Promise.all([pD(),pS(),pA()]).then(function(){toast("Removed",true);});
+}
+
+function saveFee(sid,paid){
+  ST.fees[sid]={paid:Number(paid),total:ST.cfg.fee};
+  closeModal();render();pF().then(function(){toast("Fee saved");});
+}
+
+function saveNote(sid,note){
+  ST.notes[sid]=note;pN().then(function(){toast("Note saved");});
+}
+
+function saveCfg(name,teacher,fee){
+  ST.cfg={name:name,teacher:teacher,fee:Number(fee)};
+  document.getElementById("cname").textContent=ME.name+" - "+name;
+  render();pC().then(function(){toast("Saved");});
+}
+
+// ── NAVIGATION ─────────────────────────────────
 function go(tab){
   ST.tab=tab;
-  document.querySelectorAll(".nb").forEach(b=>b.classList.remove("on"));
+  document.querySelectorAll(".nb").forEach(function(b){b.classList.remove("on");});
   document.getElementById("nb-"+tab).classList.add("on");
   render();
 }
 
-// ── Modals ─────────────────────────────────────
-function closeModal(){const o=document.getElementById("moverlay");if(o)o.remove();}
+// ── MODALS ─────────────────────────────────────
+function closeModal(){var o=document.getElementById("mo");if(o)o.remove();}
 function showModal(html){
   closeModal();
-  const d=document.createElement("div");d.id="moverlay";d.className="overlay";
-  d.innerHTML=`<div class="modal">${html}</div>`;
-  d.onclick=e=>{if(e.target===d)closeModal();};
+  var d=document.createElement("div");d.id="mo";d.className="overlay";
+  d.innerHTML='<div class="modal">'+html+'</div>';
+  d.addEventListener("click",function(e){if(e.target===d)closeModal();});
   document.body.appendChild(d);
 }
 
 function modalAdd(){
-  showModal(`
-    <div style="font-weight:800;font-size:18px;margin-bottom:20px">➕ New Student</div>
-    <input class="inp" id="mn" placeholder="👤 Student Name"/>
-    <input class="inp" id="mf" placeholder="👨 Father's Name"/>
-    <input class="inp" id="mp" placeholder="📱 Phone (03XXXXXXXXX)" type="tel"/>
-    <select class="inp" id="mb"><option>Morning</option><option>Evening</option></select>
-    <div class="flex g8" style="margin-top:6px">
-      <button class="btn btn-gray" style="flex:1" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-blue" style="flex:2" onclick="addStudent(document.getElementById('mn').value,document.getElementById('mf').value,document.getElementById('mp').value,document.getElementById('mb').value)">✅ Add</button>
-    </div>`);
-  setTimeout(()=>document.getElementById("mn")?.focus(),120);
+  showModal('<div style="font-weight:800;font-size:18px;margin-bottom:20px">New Student</div>'+
+    '<input class="inp" id="mn" placeholder="Student Name"/>'+
+    '<input class="inp" id="mf" placeholder="Father Name"/>'+
+    '<input class="inp" id="mp" placeholder="Phone Number" type="tel"/>'+
+    '<select class="inp" id="mb"><option>Morning</option><option>Evening</option></select>'+
+    '<div style="display:flex;gap:8px;margin-top:6px">'+
+    '<button class="btn gray" style="flex:1" id="mc">Cancel</button>'+
+    '<button class="btn blue" style="flex:2" id="ma">Add Student</button></div>');
+  document.getElementById("mc").addEventListener("click",closeModal);
+  document.getElementById("ma").addEventListener("click",function(){
+    addStudent(document.getElementById("mn").value,document.getElementById("mf").value,
+      document.getElementById("mp").value,document.getElementById("mb").value);
+  });
+  setTimeout(function(){var el=document.getElementById("mn");if(el)el.focus();},100);
 }
 
 function modalDetail(sid){
-  const s=ST.students.find(x=>x.id===sid);if(!s)return;
-  const st=stats(sid),a=ST.attendance[sid]||{},note=ST.notes[sid]||"";
-  const cells=DAYS.map(d=>{const v=a[d]||"";return `<div class="ccell" style="background:${SBG[v]};color:${STXT[v]}"><span style="opacity:.6">${d}</span><span>${v||"·"}</span></div>`;}).join("");
-  const pc=st.pct>=75?"#16a34a":"#dc2626";
-  const hasPhoto=!!ST.photos[sid];
-  showModal(`
-    <div class="flex between g8" style="margin-bottom:16px">
-      <div style="font-weight:800;font-size:18px">👤 ${s.name}</div>
-      <button class="btn btn-gray" style="padding:5px 12px" onclick="closeModal()">✕</button>
-    </div>
-    <!-- PHOTO SECTION -->
-    <div style="text-align:center;margin-bottom:16px">
-      ${hasPhoto
-        ? `<img src="${ST.photos[sid]}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #1a2d45;margin-bottom:8px"/>`
-        : `<div style="width:100px;height:100px;border-radius:50%;background:${ME.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:38px;margin:0 auto 8px">${s.name[0].toUpperCase()}</div>`
-      }
-      <br>
-      <button class="btn" style="background:#111f35;border:1px solid #1a2d45;color:#e2e8f0;padding:7px 16px;font-size:12px" onclick="pickPhoto('${sid}')">
-        ${hasPhoto ? '🔄 Change Photo' : '📸 Add Photo'}
-      </button>
-    </div>
-    <div class="inset" style="margin-bottom:14px;font-size:13px;line-height:2">
-      👨 Father: <b>${s.father||"—"}</b><br>📱 <b>${s.phone||"—"}</b><br>🏫 Batch: <b>${s.batch}</b>
-    </div>
-    <div class="flex g8" style="margin-bottom:14px">
-      ${[["Present",st.p,"#16a34a"],["Absent",st.a,"#dc2626"],["Leave",st.l,"#d97706"],["Att%",st.pct+"%",pc]].map(([l,v,c])=>`<div style="flex:1;background:#111f35;border-radius:10px;padding:10px;border:1px solid #1a2d45;text-align:center"><div style="font-weight:900;font-size:19px;color:${c}">${v}</div><div style="font-size:10px;color:#4a6080">${l}</div></div>`).join("")}
-    </div>
-    <div style="font-weight:700;font-size:13px;margin-bottom:8px">📅 30-Day Calendar</div>
-    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">${cells}</div>
-    <textarea class="inp" id="mnote" placeholder="📝 Teacher note…">${note}</textarea>
-    <div class="flex g8 wrap">
-      <button class="btn btn-gray" style="flex:1" onclick="saveNote('${sid}',document.getElementById('mnote').value)">💾 Note</button>
-      <a class="btn btn-wa" style="flex:1;padding:10px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 WA</a>
-      <button class="btn btn-red" style="padding:10px 14px" onclick="delStudent('${sid}')">🗑</button>
-    </div>`);
+  var s=ST.students.find(function(x){return x.id===sid;});if(!s)return;
+  var st=stats(sid),a=ST.att[sid]||{},note=ST.notes[sid]||"";
+  var cells=DAYS.map(function(d){var v=a[d]||"";
+    return '<div class="ccell" style="background:'+SBG[v]+';color:'+STC[v]+';border:1px solid rgba(255,255,255,.05)"><span style="opacity:.6;font-size:7px">'+d+'</span><span>'+(v||"·")+'</span></div>';
+  }).join("");
+  var pc=st.pct>=75?"#16a34a":"#dc2626";
+  var hp=!!ST.photos[sid];
+  showModal(
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
+    '<div style="font-weight:800;font-size:18px">'+s.name+'</div>'+
+    '<button class="btn gray" style="padding:5px 12px" id="mdc">X</button></div>'+
+    '<div style="text-align:center;margin-bottom:16px">'+
+    (hp?'<img src="'+ST.photos[sid]+'" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #1a2d45;margin-bottom:8px"/>':
+      '<div class="av" style="width:100px;height:100px;font-size:38px;background:'+ME.color+';margin:0 auto 8px">'+s.name[0].toUpperCase()+'</div>')+
+    '<br><button class="btn gray" style="font-size:12px;padding:7px 16px" id="mdph">'+(hp?"Change Photo":"Add Photo")+'</button></div>'+
+    '<div style="background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;margin-bottom:14px;font-size:13px;line-height:2">'+
+    'Father: <b>'+(s.father||"-")+'</b><br>Phone: <b>'+(s.phone||"-")+'</b><br>Batch: <b>'+s.batch+'</b></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:14px">'+
+    [["Present",st.p,"#16a34a"],["Absent",st.a,"#dc2626"],["Leave",st.l,"#d97706"],["Att%",st.pct+"%",pc]].map(function(x){
+      return '<div style="flex:1;background:#111f35;border-radius:10px;padding:10px;border:1px solid #1a2d45;text-align:center"><div style="font-weight:900;font-size:19px;color:'+x[2]+'">'+x[1]+'</div><div style="font-size:10px;color:#4a6080">'+x[0]+'</div></div>';
+    }).join("")+'</div>'+
+    '<div style="font-weight:700;font-size:13px;margin-bottom:8px">30-Day Calendar</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px">'+cells+'</div>'+
+    '<textarea class="inp" id="mdn" style="min-height:60px" placeholder="Teacher note...">'+note+'</textarea>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn gray" style="flex:1" id="mdsn">Save Note</button>'+
+    '<a class="btn wa" style="flex:1;padding:10px;text-align:center" href="'+waLink(s.phone,mFull(s))+'" target="_blank">WA Report</a>'+
+    '<button class="btn red" style="padding:10px 14px" id="mdd">Delete</button></div>'
+  );
+  document.getElementById("mdc").addEventListener("click",closeModal);
+  document.getElementById("mdph").addEventListener("click",function(){pickPhoto(sid);});
+  document.getElementById("mdsn").addEventListener("click",function(){saveNote(sid,document.getElementById("mdn").value);});
+  document.getElementById("mdd").addEventListener("click",function(){delStudent(sid);});
 }
 
 function modalFee(sid){
-  const s=ST.students.find(x=>x.id===sid);if(!s)return;
-  const f=ST.fees[sid]||{paid:0,total:ST.settings.feeTotal};
-  const pct=Math.min(100,Math.round(f.paid/f.total*100)),due=f.total-f.paid;
-  const col=f.paid>=f.total?"#16a34a":f.paid>0?"#d97706":"#dc2626";
-  showModal(`
-    <div class="flex between g8" style="margin-bottom:16px">
-      <div style="font-weight:800;font-size:17px">💰 Fee — ${s.name}</div>
-      <button class="btn btn-gray" style="padding:5px 12px" onclick="closeModal()">✕</button>
-    </div>
-    <div class="flex g8" style="margin-bottom:12px">
-      ${[["Total","Rs."+f.total,"#3b82f6"],["Paid","Rs."+f.paid,"#16a34a"],["Due","Rs."+due,col]].map(([l,v,c])=>`<div style="flex:1;background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;text-align:center"><div style="font-weight:900;font-size:17px;color:${c}">${v}</div><div style="font-size:11px;color:#4a6080">${l}</div></div>`).join("")}
-    </div>
-    <div class="pbar"><div class="pfill" style="width:${pct}%;background:${col}"></div></div>
-    <input class="inp" id="mpaid" type="number" value="${f.paid}" min="0" style="margin-top:12px"/>
-    <div class="flex g8">
-      <button class="btn btn-blue" style="flex:2" onclick="saveFee('${sid}',document.getElementById('mpaid').value)">💾 Save</button>
-      <a class="btn btn-wa" style="flex:1;padding:10px" href="${wa(s.phone,msgFee(s))}" target="_blank">📱 Remind</a>
-    </div>`);
+  var s=ST.students.find(function(x){return x.id===sid;});if(!s)return;
+  var f=ST.fees[sid]||{paid:0,total:ST.cfg.fee};
+  var pct=Math.min(100,Math.round(f.paid/f.total*100)),due=f.total-f.paid;
+  var col=f.paid>=f.total?"#16a34a":f.paid>0?"#d97706":"#dc2626";
+  showModal(
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
+    '<div style="font-weight:800;font-size:17px">Fee - '+s.name+'</div>'+
+    '<button class="btn gray" style="padding:5px 12px" id="mfc">X</button></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:12px">'+
+    [["Total","Rs."+f.total,"#3b82f6"],["Paid","Rs."+f.paid,"#16a34a"],["Due","Rs."+due,col]].map(function(x){
+      return '<div style="flex:1;background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;text-align:center"><div style="font-weight:900;font-size:17px;color:'+x[2]+'">'+x[1]+'</div><div style="font-size:11px;color:#4a6080">'+x[0]+'</div></div>';
+    }).join("")+'</div>'+
+    '<div class="pbar"><div class="pfill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+    '<input class="inp" id="mfp" type="number" value="'+f.paid+'" min="0" style="margin-top:12px"/>'+
+    '<div style="display:flex;gap:8px">'+
+    '<button class="btn blue" style="flex:2" id="mfs">Save Fee</button>'+
+    '<a class="btn wa" style="flex:1;padding:10px;text-align:center" href="'+waLink(s.phone,mFee(s))+'" target="_blank">Remind</a></div>'
+  );
+  document.getElementById("mfc").addEventListener("click",closeModal);
+  document.getElementById("mfs").addEventListener("click",function(){saveFee(sid,document.getElementById("mfp").value);});
 }
 
-// ── Render ─────────────────────────────────────
+// Photo
+function pickPhoto(sid){
+  var inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.capture="environment";
+  inp.onchange=function(e){
+    var file=e.target.files[0];if(!file)return;
+    var rd=new FileReader();rd.onload=function(ev){
+      var img=new Image();img.onload=function(){
+        var cv=document.createElement("canvas"),M=200,w=img.width,h=img.height;
+        if(w>h){if(w>M){h=h*M/w;w=M;}}else{if(h>M){w=w*M/h;h=M;}}
+        cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h);
+        pPh(sid,cv.toDataURL("image/jpeg",.7)).then(function(){render();if(document.getElementById("mo"))modalDetail(sid);toast("Photo saved!");});
+      };img.src=ev.target.result;
+    };rd.readAsDataURL(file);
+  };inp.click();
+}
+
+// ── RENDER ─────────────────────────────────────
 function render(){
   if(!ME)return;
-  document.getElementById("cname").textContent=`${ME.name} — ${ST.settings.courseName}`;
-  const el=document.getElementById("content"),fs=filtered();
-  if(ST.tab==="attendance") el.innerHTML=pageAtt(fs);
-  else if(ST.tab==="students")  el.innerHTML=pageStu(fs);
-  else if(ST.tab==="reports")   el.innerHTML=pageRep();
-  else if(ST.tab==="analysis")  el.innerHTML=pageAna();
-  else if(ST.tab==="settings")  el.innerHTML=pageSets();
+  document.getElementById("cname").textContent=ME.name+" - "+ST.cfg.name;
+  var el=document.getElementById("content"),fs=filt();
+  if(ST.tab==="attendance")el.innerHTML=pgAtt(fs);
+  else if(ST.tab==="students")el.innerHTML=pgStu(fs);
+  else if(ST.tab==="reports")el.innerHTML=pgRep();
+  else if(ST.tab==="analysis")el.innerHTML=pgAna();
+  else if(ST.tab==="settings")el.innerHTML=pgSet();
+  bindEvents();
 }
 
-function pageAtt(fs){
-  const day=ST.day,sum={P:0,A:0,L:0,"":0};
-  fs.forEach(s=>{const v=(ST.attendance[s.id]||{})[day]||"";sum[v]=(sum[v]||0)+1;});
-  const dbtns=DAYS.map(d=>{const mk=ST.students.some(s=>(ST.attendance[s.id]||{})[d]);return `<button class="daybtn${d===day?" sel":mk?" mrkd":""}" onclick="ST.day=${d};render()">${d}</button>`;}).join(" ");
-  const rows=fs.map(s=>{
-    const v=(ST.attendance[s.id]||{})[day]||"",st=stats(s.id),pc=st.pct>=75?"#16a34a":"#dc2626";
-    const alrt=v==="A"?`<a class="btn btn-wa" style="padding:8px 10px;font-size:14px" href="${wa(s.phone,msgAbsent(s))}" target="_blank">📱</a>`:"";
-    return `<div class="card flex g10">${avHtml(s.id,44,s.name,ME.color)}<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div><div style="font-size:11px;color:#4a6080;margin-top:2px">👨 ${s.father||"—"} • ${s.batch}</div><div style="font-size:10px;font-weight:700;color:${pc};margin-top:2px">${st.pct}% • P:${st.p} A:${st.a} L:${st.l}</div></div><div class="flex g6"><button class="sbtn" style="background:${SBG[v]};color:${STXT[v]}" onclick="toggleAtt('${s.id}')">${SLBL[v]}</button>${alrt}</div></div>`;
+function bindEvents(){
+  document.querySelectorAll("[data-att]").forEach(function(b){b.addEventListener("click",function(){toggleAtt(b.dataset.att);});});
+  document.querySelectorAll("[data-detail]").forEach(function(b){b.addEventListener("click",function(){modalDetail(b.dataset.detail);});});
+  document.querySelectorAll("[data-fee]").forEach(function(b){b.addEventListener("click",function(){modalFee(b.dataset.fee);});});
+  document.querySelectorAll("[data-day]").forEach(function(b){b.addEventListener("click",function(){ST.day=parseInt(b.dataset.day);render();});});
+  document.querySelectorAll("[data-ma]").forEach(function(b){b.addEventListener("click",function(){markAll(b.dataset.ma);});});
+  document.querySelectorAll("[data-rv]").forEach(function(b){b.addEventListener("click",function(){ST.rv=b.dataset.rv;render();});});
+  var sr=document.getElementById("sr");if(sr)sr.addEventListener("input",function(){ST.search=this.value;render();});
+  var bf=document.getElementById("bf");if(bf)bf.addEventListener("change",function(){ST.batch=this.value;render();});
+  var ab=document.getElementById("addbtn");if(ab)ab.addEventListener("click",modalAdd);
+  var ab2=document.getElementById("addbtn2");if(ab2)ab2.addEventListener("click",modalAdd);
+  var pb=document.getElementById("printbtn");if(pb)pb.addEventListener("click",printSheet);
+  var sv=document.getElementById("svsave");if(sv)sv.addEventListener("click",function(){saveCfg(document.getElementById("scn").value,document.getElementById("sct").value,document.getElementById("scf").value);});
+  var sy=document.getElementById("synow");if(sy)sy.addEventListener("click",function(){pull().then(function(){toast("Synced!");});});
+  var lo=document.getElementById("logoutbtn2");if(lo)lo.addEventListener("click",doLogout);
+}
+
+// ── PAGES ───────────────────────────────────────
+function pgAtt(fs){
+  var day=ST.day,sum={P:0,A:0,L:0,"":0};
+  fs.forEach(function(s){var v=(ST.att[s.id]||{})[day]||"";sum[v]=(sum[v]||0)+1;});
+  var dbtns=DAYS.map(function(d){var mk=ST.students.some(function(s){return(ST.att[s.id]||{})[d];});
+    return '<button class="daybtn'+(d===day?" sel":mk?" mrkd":"")+'" data-day="'+d+'">'+d+'</button>';}).join(" ");
+  var rows=fs.map(function(s){
+    var v=(ST.att[s.id]||{})[day]||"",st=stats(s.id),pc=st.pct>=75?"#16a34a":"#dc2626";
+    var al=v==="A"?'<a class="btn wa" style="padding:8px 10px;font-size:14px" href="'+waLink(s.phone,mAbsent(s))+'" target="_blank">WA</a>':"";
+    return '<div class="card" style="display:flex;align-items:center;gap:10px">'+avHtml(s.id,44,s.name,ME.color)+
+      '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.name+'</div>'+
+      '<div style="font-size:11px;color:#4a6080;margin-top:2px">'+(s.father||"-")+" - "+s.batch+'</div>'+
+      '<div style="font-size:10px;font-weight:700;color:'+pc+';margin-top:2px">'+st.pct+'% P:'+st.p+' A:'+st.a+'</div></div>'+
+      '<div style="display:flex;gap:6px"><button style="min-width:88px;padding:9px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;background:'+SBG[v]+';color:'+STC[v]+'" data-att="'+s.id+'">'+SL[v]+'</button>'+al+'</div></div>';
   }).join("");
-  return `<div class="card"><div class="flex between wrap g8" style="margin-bottom:10px"><span style="font-weight:800;font-size:16px">📅 Day ${day}/30</span><div class="flex g6"><button class="btn" style="background:#16a34a;color:#fff;padding:6px 11px;font-size:11px" onclick="markAll('P')">All P</button><button class="btn" style="background:#dc2626;color:#fff;padding:6px 11px;font-size:11px" onclick="markAll('A')">All A</button><button class="btn" style="background:#d97706;color:#fff;padding:6px 11px;font-size:11px" onclick="markAll('L')">All L</button></div></div><div style="display:flex;flex-wrap:wrap;gap:5px">${dbtns}</div></div><div class="flex g8 wrap" style="margin-bottom:14px">${[["P","Present","#16a34a"],["A","Absent","#dc2626"],["L","Leave","#d97706"],["","Unmarked","#4a6080"]].map(([s,l,c])=>`<div class="chip"><div style="font-weight:900;font-size:22px;color:${c}">${sum[s]||0}</div><div style="font-size:10px;color:#4a6080">${l}</div></div>`).join("")}</div><input class="inp" style="margin-bottom:12px" placeholder="🔍 Search…" value="${ST.search}" oninput="ST.search=this.value;render()"/>${fs.length===0?`<div style="text-align:center;padding:44px;color:#4a6080">No students yet</div>`:rows}`;
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">'+
+    '<span style="font-weight:800;font-size:16px">Day '+day+'/30</span>'+
+    '<div style="display:flex;gap:6px">'+
+    '<button class="btn" style="background:#16a34a;color:#fff;padding:6px 10px;font-size:11px" data-ma="P">All P</button>'+
+    '<button class="btn" style="background:#dc2626;color:#fff;padding:6px 10px;font-size:11px" data-ma="A">All A</button>'+
+    '<button class="btn" style="background:#d97706;color:#fff;padding:6px 10px;font-size:11px" data-ma="L">All L</button></div></div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:5px">'+dbtns+'</div></div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'+
+    [["P","Present","#16a34a"],["A","Absent","#dc2626"],["L","Leave","#d97706"],["","Unmarked","#4a6080"]].map(function(x){
+      return '<div class="chip"><div style="font-weight:900;font-size:22px;color:'+x[2]+'">'+(sum[x[0]]||0)+'</div><div style="font-size:10px;color:#4a6080">'+x[1]+'</div></div>';}).join("")+'</div>'+
+    '<input class="inp" id="sr" style="margin-bottom:12px" placeholder="Search..." value="'+ST.search+'"/>'+
+    (fs.length===0?'<div style="text-align:center;padding:44px;color:#4a6080">No students</div>':rows);
 }
 
-function pageStu(fs){
-  const cards=fs.map(s=>{
-    const st=stats(s.id),f=ST.fees[s.id]||{paid:0,total:ST.settings.feeTotal};
-    const fp=Math.min(100,Math.round(f.paid/f.total*100)),fc=f.paid>=f.total?"#16a34a":f.paid>0?"#d97706":"#dc2626",pc=st.pct>=75?"#16a34a":"#dc2626";
-    return `<div class="card"><div class="flex g10" style="align-items:flex-start;margin-bottom:10px">${avHtml(s.id,46,s.name,ME.color)}<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">${s.name}</div><div style="font-size:12px;color:#4a6080;margin-top:2px">👨 ${s.father||"—"} • 📱 ${s.phone||"—"}</div><div style="font-size:11px;color:#4a6080">🏫 ${s.batch}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-weight:900;font-size:21px;color:${pc}">${st.pct}%</div><div style="font-size:10px;color:#4a6080">P:${st.p} A:${st.a}</div></div></div><div class="pbar"><div class="pfill" style="width:${fp}%;background:${fc}"></div></div><div class="flex between" style="margin-bottom:10px"><span style="font-size:11px;color:${fc};font-weight:700">Fee: Rs.${f.paid}/${f.total}</span>${ST.notes[s.id]?`<span style="font-size:10px;color:#4a6080">📝</span>`:""}</div><div class="flex g8 wrap"><button class="btn btn-gray" style="flex:1;padding:8px" onclick="modalDetail('${s.id}')">📋 Detail</button><button class="btn btn-gray" style="flex:1;padding:8px" onclick="modalFee('${s.id}')">💰 Fee</button><a class="btn btn-wa" style="flex:1;padding:8px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 WA</a><a class="btn btn-amber" style="flex:1;padding:8px" href="${wa(s.phone,msgFee(s))}" target="_blank">💸 Fee</a></div></div>`;
+function pgStu(fs){
+  var cards=fs.map(function(s){
+    var st=stats(s.id),f=ST.fees[s.id]||{paid:0,total:ST.cfg.fee};
+    var fp=Math.min(100,Math.round(f.paid/f.total*100)),fc=f.paid>=f.total?"#16a34a":f.paid>0?"#d97706":"#dc2626";
+    var pc=st.pct>=75?"#16a34a":"#dc2626";
+    return '<div class="card"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">'+
+      avHtml(s.id,46,s.name,ME.color)+
+      '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">'+s.name+'</div>'+
+      '<div style="font-size:12px;color:#4a6080;margin-top:2px">Father: '+(s.father||"-")+'</div>'+
+      '<div style="font-size:12px;color:#4a6080">Phone: '+(s.phone||"-")+'</div>'+
+      '<div style="font-size:11px;color:#4a6080">Batch: '+s.batch+'</div></div>'+
+      '<div style="text-align:right;flex-shrink:0"><div style="font-weight:900;font-size:21px;color:'+pc+'">'+st.pct+'%</div>'+
+      '<div style="font-size:10px;color:#4a6080">P:'+st.p+' A:'+st.a+'</div></div></div>'+
+      '<div class="pbar"><div class="pfill" style="width:'+fp+'%;background:'+fc+'"></div></div>'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:10px">'+
+      '<span style="font-size:11px;color:'+fc+';font-weight:700">Fee: Rs.'+f.paid+'/'+f.total+'</span>'+
+      (ST.notes[s.id]?'<span style="font-size:10px;color:#4a6080">Note</span>':'')+
+      '</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<button class="btn gray" style="flex:1;padding:8px" data-detail="'+s.id+'">Detail</button>'+
+      '<button class="btn gray" style="flex:1;padding:8px" data-fee="'+s.id+'">Fee</button>'+
+      '<a class="btn wa" style="flex:1;padding:8px;text-align:center" href="'+waLink(s.phone,mFull(s))+'" target="_blank">WA</a>'+
+      '<a class="btn amber" style="flex:1;padding:8px;text-align:center;text-decoration:none" href="'+waLink(s.phone,mFee(s))+'" target="_blank">Fee WA</a>'+
+      '</div></div>';
   }).join("");
-  return `<div class="flex g8 wrap" style="margin-bottom:14px"><input class="inp" style="flex:1;min-width:130px;margin-bottom:0" placeholder="🔍 Search…" value="${ST.search}" oninput="ST.search=this.value;render()"/><select class="inp" style="width:auto;margin-bottom:0" onchange="ST.batch=this.value;render()">${["All","Morning","Evening"].map(b=>`<option${ST.batch===b?" selected":""}>${b}</option>`).join("")}</select><button class="btn btn-blue" style="white-space:nowrap;padding:11px 16px" onclick="modalAdd()">＋ Add</button></div>${fs.length===0?`<div style="text-align:center;padding:44px;color:#4a6080">No students yet.<br><br><button class="btn btn-blue" onclick="modalAdd()">＋ Add First Student</button></div>`:cards}`;
+  return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'+
+    '<input class="inp" id="sr" style="flex:1;min-width:130px;margin-bottom:0" placeholder="Search..." value="'+ST.search+'"/>'+
+    '<select class="inp" id="bf" style="width:auto;margin-bottom:0">'+
+    ["All","Morning","Evening"].map(function(b){return '<option'+(ST.batch===b?" selected":"")+'>'+b+'</option>';}).join("")+
+    '</select><button class="btn blue" id="addbtn" style="white-space:nowrap;padding:11px 16px">+ Add</button></div>'+
+    (fs.length===0?'<div style="text-align:center;padding:44px;color:#4a6080">No students<br><br><button class="btn blue" id="addbtn2">+ Add First Student</button></div>':cards);
 }
 
-function pageRep(){
-  if(!ST.students.length) return`<div style="text-align:center;padding:44px;color:#4a6080">No students yet</div>`;
-
-  // ── View mode toggle ──────────────────────────────────────────
-  const vmode = ST.repView || "sheet"; // "sheet" | "weekly" | "whatsapp"
-
-  const tabs = [
-    {id:"sheet",   icon:"📋", label:"Register Sheet"},
-    {id:"weekly",  icon:"📊", label:"Weekly"},
-    {id:"whatsapp",icon:"💬", label:"WhatsApp"},
-  ].map(t=>`
-    <button onclick="ST.repView='${t.id}';render()"
-      style="flex:1;padding:9px 4px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;
-      background:${vmode===t.id?"#2563eb":"#111f35"};color:${vmode===t.id?"#fff":"#4a6080"};border:1px solid ${vmode===t.id?"#2563eb":"#1a2d45"}">
-      ${t.icon} ${t.label}
-    </button>`).join("");
-
-  if(vmode==="sheet")    return tabsHtml(tabs) + pageSheet();
-  if(vmode==="weekly")   return tabsHtml(tabs) + pageWeekly();
-  if(vmode==="whatsapp") return tabsHtml(tabs) + pageWA();
-  return "";
+function pgRep(){
+  var vm=ST.rv||"sheet";
+  var tabs=['<div style="display:flex;gap:8px;margin-bottom:14px">'];
+  [{id:"sheet",l:"Register"},{id:"weekly",l:"Weekly"},{id:"wa",l:"WhatsApp"}].forEach(function(t){
+    tabs.push('<button data-rv="'+t.id+'" style="flex:1;padding:9px 4px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;background:'+(vm===t.id?"#2563eb":"#111f35")+';color:'+(vm===t.id?"#fff":"#4a6080")+';border:1px solid '+(vm===t.id?"#2563eb":"#1a2d45")+'">'+t.l+'</button>');
+  });
+  tabs.push('</div>');
+  if(vm==="sheet")return tabs.join("")+pgSheet();
+  if(vm==="weekly")return tabs.join("")+pgWeekly();
+  return tabs.join("")+pgWA();
 }
 
-function tabsHtml(tabs){
-  return `<div style="display:flex;gap:8px;margin-bottom:14px">${tabs}</div>`;
+function pgSheet(){
+  var ss=ST.students;
+  var totF=ss.reduce(function(s,st){return s+(ST.fees[st.id]&&ST.fees[st.id].paid||0);},0);
+  var dh=DAYS.map(function(d){return '<th style="min-width:26px;padding:4px 2px;text-align:center;font-size:10px;font-weight:700;background:#1e3a8a;color:#fff;border:1px solid #1a2d45">'+d+'</th>';}).join("");
+  var rows=ss.map(function(s,i){
+    var att=ST.att[s.id]||{},st=stats(s.id),fee=ST.fees[s.id]||{paid:0,total:ST.cfg.fee},note=ST.notes[s.id]||"";
+    var pc=st.pct>=75?"#16a34a":"#dc2626",fc=fee.paid>=fee.total?"#16a34a":fee.paid>0?"#d97706":"#dc2626";
+    var dc=DAYS.map(function(d){var v=att[d]||"";var bg=v==="P"?"#16a34a":v==="A"?"#dc2626":v==="L"?"#d97706":"transparent";
+      return '<td style="text-align:center;font-size:10px;font-weight:700;background:'+bg+';color:'+(v?"#fff":"#4a6080")+';border:1px solid #1a2d45;padding:3px 1px">'+(v||"·")+'</td>';}).join("");
+    return '<tr style="background:'+(i%2===0?"#0d1b2e":"#111f35")+'">'+
+      '<td style="padding:6px 8px;font-size:11px;font-weight:700;border:1px solid #1a2d45;white-space:nowrap">'+(i+1)+'. '+s.name+'</td>'+
+      '<td style="padding:6px 8px;font-size:10px;color:#4a6080;border:1px solid #1a2d45;white-space:nowrap">'+(s.father||"-")+'</td>'+
+      '<td style="padding:6px 8px;font-size:10px;color:#4a6080;border:1px solid #1a2d45;white-space:nowrap">'+(s.phone||"-")+'</td>'+
+      dc+
+      '<td style="text-align:center;font-size:11px;font-weight:800;color:#16a34a;border:1px solid #1a2d45;padding:4px">'+st.p+'</td>'+
+      '<td style="text-align:center;font-size:11px;font-weight:800;color:#dc2626;border:1px solid #1a2d45;padding:4px">'+st.a+'</td>'+
+      '<td style="text-align:center;font-size:11px;font-weight:800;color:#d97706;border:1px solid #1a2d45;padding:4px">'+st.l+'</td>'+
+      '<td style="text-align:center;font-size:12px;font-weight:900;color:'+pc+';border:1px solid #1a2d45;padding:4px">'+st.pct+'%</td>'+
+      '<td style="text-align:center;font-size:11px;font-weight:700;color:'+fc+';border:1px solid #1a2d45;padding:4px">Rs.'+fee.paid+'</td>'+
+      '<td style="padding:4px 6px;font-size:10px;color:#4a6080;border:1px solid #1a2d45">'+(note||"-")+'</td></tr>';
+  }).join("");
+  var totP=ss.reduce(function(s,st){return s+stats(st.id).p;},0);
+  var totA=ss.reduce(function(s,st){return s+stats(st.id).a;},0);
+  var avg=ss.length?Math.round(ss.reduce(function(s,st){return s+stats(st.id).pct;},0)/ss.length):0;
+  return '<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+    '<div><div style="font-weight:900;font-size:17px">'+ST.cfg.name+'</div><div style="font-size:12px;color:#4a6080;margin-top:3px">'+ME.name+' | '+ss.length+' Students | 30 Days</div></div>'+
+    '<button id="printbtn" class="btn blue" style="padding:9px 16px">Print / PDF</button></div></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'+
+    [["Students",ss.length,"#3b82f6"],["Avg",avg+"%","#16a34a"],["Total P",totP,"#16a34a"],["Total A",totA,"#dc2626"],["Fee","Rs."+totF,"#d97706"]].map(function(x){
+      return '<div style="flex:1;min-width:70px;background:#0d1b2e;border:1px solid #1a2d45;border-radius:10px;padding:8px;text-align:center"><div style="font-size:10px;color:#4a6080">'+x[0]+'</div><div style="font-weight:900;font-size:15px;color:'+x[2]+';margin-top:2px">'+x[1]+'</div></div>';}).join("")+'</div>'+
+    '<div style="overflow-x:auto;border-radius:12px;border:1px solid #1a2d45"><table id="reg-table" style="width:100%;border-collapse:collapse">'+
+    '<thead><tr><th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:150px">Student</th>'+
+    '<th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:90px">Father</th>'+
+    '<th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:90px">Phone</th>'+
+    dh+
+    '<th style="padding:8px;background:#16a34a;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:28px">P</th>'+
+    '<th style="padding:8px;background:#dc2626;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:28px">A</th>'+
+    '<th style="padding:8px;background:#d97706;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:28px">L</th>'+
+    '<th style="padding:8px;background:#0891b2;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:38px">%</th>'+
+    '<th style="padding:8px;background:#16a34a;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:52px">Fee</th>'+
+    '<th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:80px">Note</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table></div>'+
+    '<div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;font-size:11px;color:#4a6080">'+
+    '<span>P=Present</span><span>A=Absent</span><span>L=Leave</span><span>dot=Not Marked</span></div>';
 }
 
-// ── REGISTER SHEET ────────────────────────────────────────────
-function pageSheet(){
-  const students = ST.students;
-  const totalFee = students.reduce((s,st)=>s+(ST.fees[st.id]?.paid||0),0);
-
-  // Build day headers
-  const dayHeaders = DAYS.map(d=>`<th style="min-width:28px;padding:4px 2px;text-align:center;font-size:10px;font-weight:700;background:#1e3a8a;color:#fff;border:1px solid #1a2d45">${d}</th>`).join("");
-
-  // Build student rows
-  const rows = students.map((s,idx)=>{
-    const att  = ST.attendance[s.id]||{};
-    const st   = stats(s.id);
-    const fee  = ST.fees[s.id]||{paid:0,total:ST.settings.feeTotal};
-    const note = ST.notes[s.id]||"";
-    const pc   = st.pct>=75?"#16a34a":"#dc2626";
-    const feec = fee.paid>=fee.total?"#16a34a":fee.paid>0?"#d97706":"#dc2626";
-
-    const dayCells = DAYS.map(d=>{
-      const v = att[d]||"";
-      const bg = v==="P"?"#16a34a":v==="A"?"#dc2626":v==="L"?"#d97706":"transparent";
-      const tc = v?"#fff":"#4a6080";
-      return `<td style="text-align:center;font-size:10px;font-weight:700;background:${bg};color:${tc};border:1px solid #1a2d45;padding:3px 1px">${v||"·"}</td>`;
+function pgWeekly(){
+  if(!ST.students.length)return '<div style="text-align:center;padding:44px;color:#4a6080">No students</div>';
+  return ST.students.map(function(s){
+    var wbs=WEEKS.map(function(w,wi){
+      var a=ST.att[s.id]||{},p=0,ab=0,l=0;
+      w.d.forEach(function(d){if(a[d]==="P")p++;else if(a[d]==="A")ab++;else if(a[d]==="L")l++;});
+      return '<a href="'+waLink(s.phone,mWeek(s,wi))+'" target="_blank" style="flex:1;min-width:78px;background:#111f35;border-radius:10px;padding:10px 8px;border:1px solid #1a2d45;text-align:center;text-decoration:none;color:#e2e8f0;display:block">'+
+        '<div style="font-weight:700;font-size:11px;color:#3b82f6">'+w.l+'</div>'+
+        '<div style="font-size:10px;margin-top:4px;color:#4a6080">P:'+p+' A:'+ab+' L:'+l+'</div>'+
+        '<div style="font-size:9px;color:#25d366;margin-top:3px;font-weight:700">Send</div></a>';
     }).join("");
-
-    const rowBg = idx%2===0?"#0d1b2e":"#111f35";
-
-    return `<tr style="background:${rowBg}">
-      <td style="padding:6px 8px;font-size:11px;font-weight:700;border:1px solid #1a2d45;white-space:nowrap;min-width:140px">${idx+1}. ${s.name}</td>
-      <td style="padding:6px 8px;font-size:10px;color:#4a6080;border:1px solid #1a2d45;white-space:nowrap">${s.father||"—"}</td>
-      <td style="padding:6px 8px;font-size:10px;color:#4a6080;border:1px solid #1a2d45;white-space:nowrap">${s.phone||"—"}</td>
-      ${dayCells}
-      <td style="text-align:center;font-size:11px;font-weight:800;color:#16a34a;border:1px solid #1a2d45;padding:4px">${st.p}</td>
-      <td style="text-align:center;font-size:11px;font-weight:800;color:#dc2626;border:1px solid #1a2d45;padding:4px">${st.a}</td>
-      <td style="text-align:center;font-size:11px;font-weight:800;color:#d97706;border:1px solid #1a2d45;padding:4px">${st.l}</td>
-      <td style="text-align:center;font-size:12px;font-weight:900;color:${pc};border:1px solid #1a2d45;padding:4px">${st.pct}%</td>
-      <td style="text-align:center;font-size:11px;font-weight:700;color:${feec};border:1px solid #1a2d45;padding:4px">Rs.${fee.paid}</td>
-      <td style="padding:4px 6px;font-size:10px;color:#4a6080;border:1px solid #1a2d45;max-width:100px;overflow:hidden;text-overflow:ellipsis">${note||"—"}</td>
-    </tr>`;
+    return '<div class="card"><div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">'+
+      avHtml(s.id,40,s.name,ME.color)+
+      '<div style="flex:1"><div style="font-weight:700">'+s.name+'</div><div style="font-size:11px;color:#4a6080">'+(s.father||"-")+'</div></div>'+
+      '<a class="btn wa" style="padding:7px 12px;font-size:12px" href="'+waLink(s.phone,mFull(s))+'" target="_blank">Full</a></div>'+
+      '<div style="display:flex;gap:7px;flex-wrap:wrap">'+wbs+'</div></div>';
   }).join("");
-
-  // Summary row
-  const totP = students.reduce((s,st)=>s+stats(st.id).p,0);
-  const totA = students.reduce((s,st)=>s+stats(st.id).a,0);
-  const totL = students.reduce((s,st)=>s+stats(st.id).l,0);
-  const avgPct = students.length ? Math.round(students.reduce((s,st)=>s+stats(st.id).pct,0)/students.length) : 0;
-
-  return `
-    <!-- Header Info -->
-    <div class="card" style="margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-        <div>
-          <div style="font-weight:900;font-size:17px">📋 ${ST.settings.courseName}</div>
-          <div style="font-size:12px;color:#4a6080;margin-top:3px">👨‍🏫 ${ME?.name||ST.settings.teacher} &nbsp;|&nbsp; 👥 ${students.length} Students &nbsp;|&nbsp; 📅 30 Days</div>
-        </div>
-        <button onclick="printSheet()" class="btn btn-blue" style="padding:9px 16px;font-size:13px">🖨️ Print / Save PDF</button>
-      </div>
-    </div>
-
-    <!-- Summary chips -->
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      ${[["👥","Students",students.length,"#3b82f6"],["✅","Total P",totP,"#16a34a"],["❌","Total A",totA,"#dc2626"],["🟡","Total L",totL,"#d97706"],["📈","Avg Att",avgPct+"%","#0891b2"],["💰","Collected","Rs."+totalFee,"#16a34a"]].map(([ic,l,v,c])=>`
-        <div style="flex:1;min-width:80px;background:#0d1b2e;border:1px solid #1a2d45;border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:10px;color:#4a6080">${ic} ${l}</div>
-          <div style="font-weight:900;font-size:16px;color:${c};margin-top:2px">${v}</div>
-        </div>`).join("")}
-    </div>
-
-    <!-- Register Table -->
-    <div style="overflow-x:auto;border-radius:12px;border:1px solid #1a2d45">
-      <table id="register-table" style="width:100%;border-collapse:collapse;font-family:'Segoe UI',sans-serif">
-        <thead>
-          <tr>
-            <th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:150px">Student Name</th>
-            <th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:100px">Father</th>
-            <th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:90px">Phone</th>
-            ${dayHeaders}
-            <th style="padding:8px;background:#16a34a;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:30px">P</th>
-            <th style="padding:8px;background:#dc2626;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:30px">A</th>
-            <th style="padding:8px;background:#d97706;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:30px">L</th>
-            <th style="padding:8px;background:#0891b2;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:40px">%</th>
-            <th style="padding:8px;background:#16a34a;color:#fff;border:1px solid #1a2d45;font-size:10px;min-width:55px">Fee</th>
-            <th style="padding:8px;text-align:left;background:#1e3a8a;color:#fff;border:1px solid #1a2d45;font-size:11px;min-width:80px">Note</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-
-    <!-- Legend -->
-    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;font-size:11px;color:#4a6080">
-      <span>🟢 P = Present</span>
-      <span>🔴 A = Absent</span>
-      <span>🟡 L = Leave</span>
-      <span>· = Not Marked</span>
-    </div>`;
 }
 
-// ── WEEKLY REPORTS ────────────────────────────────────────────
-function pageWeekly(){
-  if(!ST.students.length) return`<div style="text-align:center;padding:44px;color:#4a6080">No students yet</div>`;
-  return ST.students.map(s=>{
-    const wbs=WEEKS.map((w,wi)=>{
-      const a=ST.attendance[s.id]||{};
-      let p=0,ab=0,l=0;
-      w.d.forEach(d=>{if(a[d]==="P")p++;else if(a[d]==="A")ab++;else if(a[d]==="L")l++;});
-      return `<a href="${wa(s.phone,msgWeek(s,wi))}" target="_blank"
-        style="flex:1;min-width:78px;background:#111f35;border-radius:10px;padding:10px 8px;border:1px solid #1a2d45;text-align:center;text-decoration:none;color:#e2e8f0;display:block">
-        <div style="font-weight:700;font-size:11px;color:#3b82f6">${w.l}</div>
-        <div style="font-size:10px;margin-top:4px;color:#4a6080">✅${p} ❌${ab} 🟡${l}</div>
-        <div style="font-size:9px;color:#25d366;margin-top:3px;font-weight:700">Send ↗</div>
-      </a>`;
+function pgWA(){
+  var ss=ST.students,low=ss.filter(function(s){return stats(s.id).pct<75&&stats(s.id).t>0;});
+  return '<div class="card" style="margin-bottom:14px;background:#0a1f35;border-color:#1e3a8a">'+
+    '<div style="font-weight:800;font-size:14px;margin-bottom:10px">Class Broadcast</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<a class="btn wa" style="flex:1;padding:10px;text-align:center" href="'+waLink(ss[0]&&ss[0].phone||"",["Notice - "+ST.cfg.name,"","Dear Parents,","","Kindly ensure your child attends the vacation course regularly.","","_"+tname()+"_"].join("\n"))+'" target="_blank">Send Notice</a>'+
+    (low.length?'<div style="flex:1;background:#1a0808;border:1px solid #7f1d1d;border-radius:10px;padding:10px;text-align:center;font-size:12px;color:#ef4444;font-weight:700">'+low.length+' below 75%</div>':"")+
+    '</div></div>'+
+    '<div style="font-weight:700;font-size:14px;margin-bottom:10px">Individual Messages</div>'+
+    ss.map(function(s){
+      var st=stats(s.id),pc=st.pct>=75?"#16a34a":"#dc2626";
+      return '<div class="card" style="padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+        avHtml(s.id,38,s.name,ME.color)+
+        '<div style="flex:1;min-width:100px"><div style="font-weight:700;font-size:13px">'+s.name+'</div>'+
+        '<div style="font-size:10px;color:#4a6080">'+(s.phone||"-")+'</div>'+
+        '<div style="font-size:11px;font-weight:700;color:'+pc+'">'+st.pct+'% P:'+st.p+' A:'+st.a+'</div></div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        '<a class="btn wa" style="padding:6px 10px;font-size:11px" href="'+waLink(s.phone,mFull(s))+'" target="_blank">Full</a>'+
+        (st.pct<75?'<a class="btn red" style="padding:6px 10px;font-size:11px;text-decoration:none" href="'+waLink(s.phone,mLow(s))+'" target="_blank">Low</a>':"")+
+        '<a class="btn amber" style="padding:6px 10px;font-size:11px;text-decoration:none" href="'+waLink(s.phone,mFee(s))+'" target="_blank">Fee</a>'+
+        '</div></div></div>';
     }).join("");
-    return `<div class="card">
-      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
-        ${avHtml(s.id,40,s.name,ME?.color||"#1d4ed8")}
-        <div style="flex:1"><div style="font-weight:700">${s.name}</div><div style="font-size:11px;color:#4a6080">${s.father||"—"} • ${s.phone||"—"}</div></div>
-        <a class="btn btn-wa" style="padding:7px 12px;font-size:12px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 Full</a>
-      </div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap">${wbs}</div>
-    </div>`;
-  }).join("");
 }
 
-// ── WHATSAPP BULK ─────────────────────────────────────────────
-function pageWA(){
-  const students = ST.students;
-  const low = students.filter(s=>stats(s.id).pct<75&&stats(s.id).t>0);
-
-  const rows = students.map((s,i)=>{
-    const st=stats(s.id);
-    const pc=st.pct>=75?"#16a34a":"#dc2626";
-    return `<div class="card" style="padding:12px;margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        ${avHtml(s.id,38,s.name,ME?.color||"#1d4ed8")}
-        <div style="flex:1;min-width:100px">
-          <div style="font-weight:700;font-size:13px">${s.name}</div>
-          <div style="font-size:10px;color:#4a6080">${s.phone||"—"}</div>
-          <div style="font-size:11px;font-weight:700;color:${pc}">${st.pct}% • P:${st.p} A:${st.a}</div>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <a class="btn btn-wa" style="padding:6px 10px;font-size:11px" href="${wa(s.phone,msgFull(s))}" target="_blank">📤 Full</a>
-          ${st.pct<75?`<a class="btn" style="background:#dc2626;color:#fff;padding:6px 10px;font-size:11px" href="${wa(s.phone,msgLow(s))}" target="_blank">⚠️ Low</a>`:""}
-          <a class="btn btn-amber" style="padding:6px 10px;font-size:11px;text-decoration:none" href="${wa(s.phone,msgFee(s))}" target="_blank">💰 Fee</a>
-        </div>
-      </div>
-    </div>`;
+function pgAna(){
+  var tot=ST.students.length,avg=tot?Math.round(ST.students.reduce(function(s,st){return s+stats(st.id).pct;},0)/tot):0;
+  var totA=ST.students.reduce(function(s,st){return s+stats(st.id).a;},0);
+  var totF=ST.students.reduce(function(s,st){return s+(ST.fees[st.id]&&ST.fees[st.id].paid||0);},0);
+  var kpis=[{i:"Students",v:tot,c:"#3b82f6"},{i:"Avg Att%",v:avg+"%",c:"#16a34a"},{i:"Absents",v:totA,c:"#dc2626"},{i:"Fee",v:"Rs."+totF,c:"#d97706"}].map(function(k){
+    return '<div class="card" style="display:flex;gap:10px;align-items:center;padding:14px;margin-bottom:0"><div><div style="font-size:21px;font-weight:900;color:'+k.c+'">'+k.v+'</div><div style="font-size:11px;color:#4a6080">'+k.i+'</div></div></div>';
   }).join("");
-
-  // Class-wide broadcast message
-  const classMsg = `📚 *${ST.settings.courseName}*
-*Class Attendance Update*
-
-`+
-    `👥 Total Students: ${students.length}
-`+
-    `✅ Avg Attendance: ${students.length?Math.round(students.reduce((s,st)=>s+stats(st.id).pct,0)/students.length):0}%
-`+
-    `⚠️ Low Attendance: ${low.length} students
-
-`+
-    `_${ME?.name||ST.settings.teacher} | ${ST.settings.courseName}_`;
-
-  return `
-    <!-- Broadcast -->
-    <div class="card" style="margin-bottom:14px;background:#0a1f35;border-color:#1e3a8a">
-      <div style="font-weight:800;font-size:14px;margin-bottom:10px">📢 Class Broadcast</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <a class="btn btn-wa" style="flex:1;padding:10px" href="${wa(students[0]?.phone||"",classMsg)}" target="_blank">📢 Sample Notice</a>
-        ${low.length?`<div style="flex:1;background:#1a0808;border:1px solid #7f1d1d;border-radius:10px;padding:10px;text-align:center;font-size:12px;color:#ef4444;font-weight:700">⚠️ ${low.length} students below 75%</div>`:""}
-      </div>
-    </div>
-    <!-- Individual -->
-    <div style="font-weight:700;font-size:14px;margin-bottom:10px">📱 Individual Messages</div>
-    ${rows}`;
+  var bars=ST.students.map(function(s){var st=stats(s.id),c=st.pct>=75?"#16a34a":"#dc2626";
+    return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:600">'+s.name+'</span><span style="font-size:12px;font-weight:800;color:'+c+'">'+st.pct+'%</span></div>'+
+    '<div class="pbar"><div class="pfill" style="width:'+st.pct+'%;background:'+c+'"></div></div>'+
+    '<div style="font-size:10px;color:#4a6080">P:'+st.p+' A:'+st.a+' L:'+st.l+' / '+st.t+' days</div></div>';}).join("");
+  var low=ST.students.filter(function(s){return stats(s.id).pct<75&&stats(s.id).t>0;});
+  var ls=low.length?'<div style="background:#1a0808;border:1px solid #7f1d1d;border-radius:14px;padding:16px;margin-bottom:12px">'+
+    '<div style="font-weight:700;color:#ef4444;margin-bottom:10px">Low Attendance (below 75%)</div>'+
+    low.map(function(s){var st=stats(s.id);return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">'+
+      '<div><span style="font-weight:600">'+s.name+'</span><span style="color:#4a6080;font-size:12px"> - '+st.pct+'%</span></div>'+
+      '<a class="btn wa" style="padding:6px 12px;font-size:12px" href="'+waLink(s.phone,mLow(s))+'" target="_blank">Alert</a></div>';}).join("")+'</div>':"";
+  var feeR=ST.students.map(function(s){var f=ST.fees[s.id]||{paid:0,total:ST.cfg.fee},p=Math.min(100,Math.round(f.paid/f.total*100)),c=f.paid>=f.total?"#16a34a":f.paid>0?"#d97706":"#dc2626";
+    return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:600">'+s.name+'</span>'+
+    '<div style="display:flex;gap:8px"><span style="font-size:12px;color:'+c+';font-weight:700">Rs.'+f.paid+'/'+f.total+'</span>'+
+    '<a href="'+waLink(s.phone,mFee(s))+'" target="_blank" style="font-size:10px;color:#25d366;font-weight:700;text-decoration:none">WA</a></div></div>'+
+    '<div class="pbar"><div class="pfill" style="width:'+p+'%;background:'+c+'"></div></div></div>';}).join("");
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+kpis+'</div>'+ls+
+    '<div class="card" style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:14px">Attendance</div>'+(bars||'<div style="color:#4a6080">No students</div>')+'</div>'+
+    '<div class="card"><div style="font-weight:700;margin-bottom:12px">Fee Collection</div>'+(feeR||'<div style="color:#4a6080">No students</div>')+
+    (tot?'<div style="display:flex;justify-content:space-between;padding-top:12px;border-top:1px solid #1a2d45;margin-top:6px"><span style="font-weight:700">Total</span><span style="font-weight:900;color:#16a34a">Rs.'+totF+' / '+(tot*ST.cfg.fee)+'</span></div>':"")+'</div>';
 }
 
-// ── PRINT FUNCTION ────────────────────────────────────────────
+function pgSet(){
+  var sc=ST.sync==="live"?"#22c55e":ST.sync==="syncing"?"#f59e0b":"#ef4444";
+  return '<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:15px;margin-bottom:14px">Logged In As</div>'+
+    '<div style="display:flex;gap:12px;align-items:center">'+
+    '<div class="av" style="width:54px;height:54px;font-size:24px;background:'+ME.color+'">'+ME.name[0]+'</div>'+
+    '<div><div style="font-weight:800;font-size:16px">'+ME.name+'</div><div style="font-size:12px;color:#4a6080;margin-top:3px">'+ME.subject+'</div></div></div>'+
+    '<button id="logoutbtn2" class="btn red" style="width:100%;margin-top:14px">Logout</button></div>'+
+    '<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:15px;margin-bottom:10px">Firebase Status</div>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+    '<div class="sdot" style="background:'+sc+'"></div>'+
+    '<span style="font-size:13px;font-weight:600">'+(ST.sync==="live"?"Live":"Checking...")+'</span></div>'+
+    '<div style="background:#111f35;border-radius:10px;padding:12px;border:1px solid #1a2d45;font-size:12px;color:#4a6080;line-height:2">Path: <b style="color:#3b82f6">'+DB+'</b><br>Auto-sync every 8 seconds</div>'+
+    '<button id="synow" class="btn blue" style="width:100%;margin-top:10px">Sync Now</button></div>'+
+    '<div class="card"><div style="font-weight:800;font-size:15px;margin-bottom:12px">Course Settings</div>'+
+    '<input class="inp" id="scn" value="'+ST.cfg.name+'" placeholder="Course Name"/>'+
+    '<input class="inp" id="sct" value="'+(ST.cfg.teacher||ME.name)+'" placeholder="Teacher Name"/>'+
+    '<div style="font-size:12px;color:#4a6080;margin-bottom:6px">Default Fee (Rs.)</div>'+
+    '<input class="inp" id="scf" type="number" value="'+ST.cfg.fee+'"/>'+
+    '<button class="btn blue" id="svsave" style="width:100%;margin-top:4px">Save Settings</button></div>';
+}
+
+// ── PRINT ──────────────────────────────────────
 function printSheet(){
-  const table = document.getElementById("register-table");
-  if(!table){ alert("Please open Register Sheet tab first"); return; }
-
-  const printWin = window.open("","_blank","width=1200,height=800");
-  printWin.document.write(`<!DOCTYPE html><html><head>
-    <title>${ST.settings.courseName} — Register</title>
-    <style>
-      *{box-sizing:border-box;margin:0;padding:0}
-      body{font-family:'Segoe UI',Arial,sans-serif;padding:20px;background:#fff;color:#000}
-      h1{font-size:18px;font-weight:900;margin-bottom:4px}
-      .sub{font-size:12px;color:#555;margin-bottom:14px}
-      table{width:100%;border-collapse:collapse;font-size:9px}
-      th{background:#1e3a8a;color:#fff;padding:5px 4px;text-align:center;border:1px solid #ccc}
-      th.left{text-align:left}
-      td{padding:4px 3px;border:1px solid #ddd;text-align:center}
-      td.left{text-align:left}
-      tr:nth-child(even){background:#f8faff}
-      .p{background:#16a34a;color:#fff;font-weight:700}
-      .a{background:#dc2626;color:#fff;font-weight:700}
-      .l{background:#d97706;color:#fff;font-weight:700}
-      .good{color:#16a34a;font-weight:800}
-      .bad{color:#dc2626;font-weight:800}
-      .summary{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
-      .chip{background:#f0f4ff;border:1px solid #dbeafe;border-radius:8px;padding:8px 14px;text-align:center}
-      .chip-val{font-size:20px;font-weight:900;color:#1d4ed8}
-      .chip-lbl{font-size:10px;color:#555;margin-top:2px}
-      .legend{margin-top:10px;font-size:10px;color:#555;display:flex;gap:14px}
-      @media print{
-        body{padding:10px}
-        button{display:none}
-        @page{size:A4 landscape;margin:10mm}
-      }
-    </style>
-  </head><body>
-    <h1>🎓 ${ST.settings.courseName}</h1>
-    <div class="sub">👨‍🏫 Teacher: ${ME?.name||ST.settings.teacher} &nbsp;|&nbsp; 👥 ${ST.students.length} Students &nbsp;|&nbsp; 📅 30-Day Register &nbsp;|&nbsp; Printed: ${new Date().toLocaleDateString()}</div>
-    <div class="summary">
-      ${[["Students",ST.students.length],
-         ["Avg Attendance",ST.students.length?Math.round(ST.students.reduce((s,st)=>s+stats(st.id).pct,0)/ST.students.length)+"%":"0%"],
-         ["Total Collected","Rs."+ST.students.reduce((s,st)=>s+(ST.fees[st.id]?.paid||0),0)]
-        ].map(([l,v])=>`<div class="chip"><div class="chip-val">${v}</div><div class="chip-lbl">${l}</div></div>`).join("")}
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th class="left" style="min-width:140px">#&nbsp; Student Name</th>
-          <th class="left" style="min-width:90px">Father</th>
-          <th class="left" style="min-width:80px">Phone</th>
-          ${DAYS.map(d=>`<th style="min-width:20px">${d}</th>`).join("")}
-          <th style="background:#16a34a">P</th>
-          <th style="background:#dc2626">A</th>
-          <th style="background:#d97706">L</th>
-          <th style="background:#0891b2">%</th>
-          <th style="background:#16a34a;min-width:55px">Fee</th>
-          <th class="left" style="min-width:80px">Note</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${ST.students.map((s,idx)=>{
-          const att=ST.attendance[s.id]||{};
-          const st=stats(s.id);
-          const fee=ST.fees[s.id]||{paid:0,total:ST.settings.feeTotal};
-          const note=ST.notes[s.id]||"";
-          return `<tr>
-            <td class="left"><b>${idx+1}.</b> ${s.name}</td>
-            <td class="left">${s.father||"—"}</td>
-            <td class="left">${s.phone||"—"}</td>
-            ${DAYS.map(d=>{
-              const v=att[d]||"";
-              return `<td class="${v.toLowerCase()}">${v||"·"}</td>`;
-            }).join("")}
-            <td class="good">${st.p}</td>
-            <td class="bad">${st.a}</td>
-            <td style="color:#d97706;font-weight:700">${st.l}</td>
-            <td class="${st.pct>=75?"good":"bad"}">${st.pct}%</td>
-            <td style="color:${fee.paid>=fee.total?"#16a34a":fee.paid>0?"#d97706":"#dc2626"};font-weight:700">Rs.${fee.paid}</td>
-            <td class="left" style="font-size:8px;color:#555">${note||"—"}</td>
-          </tr>`;
-        }).join("")}
-      </tbody>
-    </table>
-    <div class="legend">
-      <span>🟢 P = Present</span>
-      <span>🔴 A = Absent</span>
-      <span>🟡 L = Leave</span>
-      <span>· = Not Marked</span>
-    </div>
-    <script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script>
-  </body></html>`);
-  printWin.document.close();
+  var win=window.open("","_blank","width=1200,height=800");
+  var rows=ST.students.map(function(s,i){
+    var att=ST.att[s.id]||{},st=stats(s.id),fee=ST.fees[s.id]||{paid:0,total:ST.cfg.fee},note=ST.notes[s.id]||"";
+    return "<tr><td class='l'><b>"+(i+1)+".</b> "+s.name+"</td><td class='l'>"+(s.father||"-")+"</td><td class='l'>"+(s.phone||"-")+"</td>"+
+      DAYS.map(function(d){var v=att[d]||"";return "<td class='"+v.toLowerCase()+"'>"+(v||"·")+"</td>";}).join("")+
+      "<td class='g'>"+st.p+"</td><td class='b'>"+st.a+"</td><td style='color:#d97706;font-weight:700'>"+st.l+"</td>"+
+      "<td class='"+(st.pct>=75?"g":"b")+"'>"+st.pct+"%</td>"+
+      "<td style='color:"+(fee.paid>=fee.total?"#16a34a":fee.paid>0?"#d97706":"#dc2626")+";font-weight:700'>Rs."+fee.paid+"</td>"+
+      "<td class='l' style='font-size:8px;color:#555'>"+(note||"-")+"</td></tr>";
+  }).join("");
+  win.document.write("<!DOCTYPE html><html><head><title>"+ST.cfg.name+"</title><style>"+
+    "*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:15px;font-size:10px}"+
+    "h1{font-size:16px;font-weight:900;margin-bottom:3px}.sub{font-size:11px;color:#555;margin-bottom:12px}"+
+    "table{width:100%;border-collapse:collapse;font-size:8px}"+
+    "th{background:#1e3a8a;color:#fff;padding:4px 3px;text-align:center;border:1px solid #ccc}"+
+    "th.l{text-align:left}td{padding:3px 2px;border:1px solid #ddd;text-align:center}td.l{text-align:left}"+
+    "tr:nth-child(even){background:#f8faff}"+
+    ".p{background:#16a34a;color:#fff;font-weight:700}.a{background:#dc2626;color:#fff;font-weight:700}"+
+    ".l{background:#d97706;color:#fff;font-weight:700}.g{color:#16a34a;font-weight:800}.b{color:#dc2626;font-weight:800}"+
+    ".legend{margin-top:8px;font-size:9px;color:#555;display:flex;gap:12px}"+
+    "@media print{@page{size:A4 landscape;margin:8mm}}"+
+    "</style></head><body>"+
+    "<h1>"+ST.cfg.name+"</h1>"+
+    "<div class='sub'>Teacher: "+ME.name+" | Students: "+ST.students.length+" | 30-Day Register | "+new Date().toLocaleDateString()+"</div>"+
+    "<table><thead><tr>"+
+    "<th class='l' style='min-width:130px'># Student</th><th class='l' style='min-width:80px'>Father</th><th class='l' style='min-width:75px'>Phone</th>"+
+    DAYS.map(function(d){return "<th style='min-width:18px'>"+d+"</th>";}).join("")+
+    "<th style='background:#16a34a'>P</th><th style='background:#dc2626'>A</th><th style='background:#d97706'>L</th>"+
+    "<th style='background:#0891b2'>%</th><th style='background:#16a34a;min-width:50px'>Fee</th><th class='l' style='min-width:70px'>Note</th>"+
+    "</tr></thead><tbody>"+rows+"</tbody></table>"+
+    "<div class='legend'><span>P=Present</span><span>A=Absent</span><span>L=Leave</span><span>dot=Not Marked</span></div>"+
+    "</body></html>");
+  win.document.close();
+  setTimeout(function(){win.print();},400);
 }
 
-function pageAna(){
-  const tot=ST.students.length,avg=tot?Math.round(ST.students.reduce((s,st)=>s+stats(st.id).pct,0)/tot):0;
-  const totA=ST.students.reduce((s,st)=>s+stats(st.id).a,0),totF=ST.students.reduce((s,st)=>s+(ST.fees[st.id]?.paid||0),0);
-  const kpis=[{i:"👥",l:"Students",v:tot,c:"#3b82f6"},{i:"📈",l:"Avg Att%",v:avg+"%",c:"#16a34a"},{i:"❌",l:"Absents",v:totA,c:"#dc2626"},{i:"💰",l:"Fee",v:"Rs."+totF,c:"#d97706"}].map(k=>`<div class="card flex g10" style="align-items:center;padding:14px;margin-bottom:0"><div style="font-size:26px">${k.i}</div><div><div style="font-size:21px;font-weight:900;color:${k.c}">${k.v}</div><div style="font-size:11px;color:#4a6080">${k.l}</div></div></div>`).join("");
-  const bars=ST.students.map(s=>{const st=stats(s.id),c=st.pct>=75?"#16a34a":"#dc2626";return `<div style="margin-bottom:12px"><div class="flex between" style="margin-bottom:4px"><span style="font-size:13px;font-weight:600">${s.name}</span><span style="font-size:12px;font-weight:800;color:${c}">${st.pct}%</span></div><div class="pbar"><div class="pfill" style="width:${st.pct}%;background:${c}"></div></div><div style="font-size:10px;color:#4a6080">P:${st.p} A:${st.a} L:${st.l} / ${st.t} days</div></div>`;}).join("");
-  const low=ST.students.filter(s=>stats(s.id).pct<75&&stats(s.id).t>0);
-  const lowSec=low.length?`<div class="lowcard"><div style="font-weight:700;color:#ef4444;margin-bottom:10px">⚠️ Low Attendance (&lt;75%)</div>${low.map(s=>{const st=stats(s.id);return`<div class="flex between wrap g8" style="margin-bottom:8px"><div><span style="font-weight:600">${s.name}</span><span style="color:#4a6080;font-size:12px"> — ${st.pct}%</span></div><a class="btn btn-wa" style="padding:6px 12px;font-size:12px" href="${wa(s.phone,msgLow(s))}" target="_blank">📱 Alert</a></div>`;}).join("")}</div>`:"";
-  const feeR=ST.students.map(s=>{const f=ST.fees[s.id]||{paid:0,total:ST.settings.feeTotal},p=Math.min(100,Math.round(f.paid/f.total*100)),c=f.paid>=f.total?"#16a34a":f.paid>0?"#d97706":"#dc2626";return`<div style="margin-bottom:12px"><div class="flex between" style="margin-bottom:4px"><span style="font-size:13px;font-weight:600">${s.name}</span><div class="flex g8"><span style="font-size:12px;color:${c};font-weight:700">Rs.${f.paid}/${f.total}</span><a href="${wa(s.phone,msgFee(s))}" target="_blank" style="font-size:10px;color:#25d366;font-weight:700;text-decoration:none">WA</a></div></div><div class="pbar"><div class="pfill" style="width:${p}%;background:${c}"></div></div></div>`;}).join("");
-  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${kpis}</div>${lowSec}<div class="card" style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:14px">📊 Attendance</div>${bars||`<div style="color:#4a6080">No students yet</div>`}</div><div class="card"><div style="font-weight:700;margin-bottom:12px">💰 Fee Collection</div>${feeR||`<div style="color:#4a6080">No students</div>`}${tot?`<div class="flex between" style="padding-top:12px;border-top:1px solid #1a2d45;margin-top:6px"><span style="font-weight:700">Total</span><span style="font-weight:900;color:#16a34a">Rs.${totF} / ${tot*ST.settings.feeTotal}</span></div>`:""}</div>`;
-}
+// ── STUDENT DATA ────────────────────────────────
 
-function pageSets(){
-  const sc=ST.sync==="live"?"#22c55e":ST.sync==="syncing"?"#f59e0b":"#ef4444",ls=ST.lastSync?ST.lastSync.toLocaleTimeString():"Never";
-  return `
-    <div class="card" style="margin-bottom:14px">
-      <div style="font-weight:800;font-size:15px;margin-bottom:14px">👨‍🏫 My Profile</div>
-      <div class="flex g12">
-        <div style="width:54px;height:54px;border-radius:50%;background:${ME.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:24px;flex-shrink:0">${ME.name[0]}</div>
-        <div>
-          <div style="font-weight:800;font-size:16px">${ME.name}</div>
-          <div style="font-size:12px;color:#4a6080;margin-top:3px">📚 ${ME.subject}</div>
-          <div style="font-size:11px;color:#4a6080;margin-top:2px">🔑 ID: ${ME.id}</div>
-        </div>
-      </div>
-      <button class="btn btn-red" style="width:100%;margin-top:14px" onclick="logout()">🚪 Logout</button>
-    </div>
-    <div class="card" style="margin-bottom:14px">
-      <div style="font-weight:800;font-size:15px;margin-bottom:10px">🔥 Firebase</div>
-      <div class="flex g8" style="margin-bottom:10px">
-        <div class="sdot" style="background:${sc}"></div>
-        <span style="font-size:13px;font-weight:600">${ST.sync==="live"?"Live":"Checking…"}</span>
-        <span style="font-size:11px;color:#4a6080">Last: ${ls}</span>
-      </div>
-      <div class="inset" style="font-size:12px;color:#4a6080;line-height:2">📂 Your data: <b style="color:#3b82f6">teachers/${ME.id}/</b><br>🔒 Private — only you can see it<br>📡 Auto-sync every 8s</div>
-      <button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="pull().then(()=>toast('Synced ✅'))">🔄 Sync Now</button>
-    </div>
-    <div class="card">
-      <div style="font-weight:800;font-size:15px;margin-bottom:12px">🎓 Course Settings</div>
-      <input class="inp" id="sc" value="${ST.settings.courseName}" placeholder="Course Name"/>
-      <input class="inp" id="st2" value="${ST.settings.teacher||ME.name}" placeholder="Teacher Name"/>
-      <div style="font-size:12px;color:#4a6080;margin-bottom:6px">💰 Default Fee (Rs.)</div>
-      <input class="inp" id="sf" type="number" value="${ST.settings.feeTotal}"/>
-      <button class="btn btn-blue" style="width:100%;margin-top:4px" onclick="saveSettings(document.getElementById('sc').value,document.getElementById('st2').value,document.getElementById('sf').value)">💾 Save</button>
-    </div>`;
-}
+var GB = [{"id": "fvc1003", "name": "Muhammad arhan", "father": "", "phone": "9900454434", "batch": "Morning"}, {"id": "fvc1004", "name": "Sohail", "father": "", "phone": "7019664761", "batch": "Morning"}, {"id": "fvc1006", "name": "Nusayr", "father": "", "phone": "8147234661", "batch": "Morning"}, {"id": "fvc1007", "name": "Ziyan", "father": "", "phone": "9900803332", "batch": "Morning"}, {"id": "fvc1008", "name": "Muhammad mizan", "father": "", "phone": "7090511176", "batch": "Morning"}, {"id": "fvc1010", "name": "Abdulqadir.I.Sayyad", "father": "Irfanahmed .H.sayyad", "phone": "9036369080", "batch": "Morning"}, {"id": "fvc1011", "name": "AbdulRahman Junaid Mulla", "father": "Junaid A Mulla", "phone": "9900696064", "batch": "Morning"}, {"id": "fvc1015", "name": "Rehan Muzaffar Kureshi", "father": "", "phone": "7760077658", "batch": "Morning"}, {"id": "fvc1016", "name": "Mahammadgous Javeed Mujawar", "father": "Javeed", "phone": "7259748178", "batch": "Morning"}, {"id": "fvc1017", "name": "Muhammad Musab Javid Mulla", "father": "Javid Isak Mulla", "phone": "9743007373", "batch": "Morning"}, {"id": "fvc1018", "name": "Abbasali M Odekar", "father": "Moulali S Odekar", "phone": "8971426800", "batch": "Morning"}, {"id": "fvc1021", "name": "Ahmed kabir Bagewadi", "father": "Irfan Bagewadi", "phone": "9886226415", "batch": "Morning"}, {"id": "fvc1022", "name": "Anasraja Bagewadi", "father": "Irfan Bagewadi", "phone": "9886226415", "batch": "Morning"}, {"id": "fvc1025", "name": "Mohammad Kais khutbudin kalakoti", "father": "wasim g maniyar", "phone": "8550081712", "batch": "Morning"}, {"id": "fvc1026", "name": "Mohammad Saad khutbudin kalakoti", "father": "wasim g maniyar", "phone": "8550081712", "batch": "Morning"}, {"id": "fvc1027", "name": "Hussain wasim maniyar", "father": "wasim g maniyar", "phone": "8550081712", "batch": "Morning"}, {"id": "fvc1028", "name": "Mohammed ARZAAN", "father": "Nawaz Naikwadi", "phone": "9036538483", "batch": "Morning"}, {"id": "fvc1029", "name": "mufeez musa Gorikhan", "father": "musa", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1030", "name": "Mujahid shaikh", "father": "N", "phone": "8904665311", "batch": "Morning"}, {"id": "fvc1032", "name": "Rehab Amjad Shekh", "father": "Amjad", "phone": "9172990161", "batch": "Morning"}, {"id": "fvc1034", "name": "Mohammad Hushen Khoja", "father": "Yunus", "phone": "9591297217", "batch": "Morning"}, {"id": "fvc1035", "name": "Ayan MalikUchagaokar", "father": "Malik", "phone": "8951466827", "batch": "Morning"}, {"id": "fvc1036", "name": "Ziyan", "father": "Malikjaan. D. Tenginkeri", "phone": "9900803332", "batch": "Morning"}, {"id": "fvc1039", "name": "Mueez Abdul Rashid Patvegar", "father": "Abdul Rasheed A Patvegar", "phone": "8861229141", "batch": "Morning"}, {"id": "fvc1041", "name": "Almez A. Sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "9743120350", "batch": "Morning"}, {"id": "fvc1042", "name": "Alfan A. sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "9743120350", "batch": "Morning"}, {"id": "fvc1043", "name": "Zohair Ahmed Sameer Ahmed Pachapuri", "father": "Sameer Ahmed", "phone": "9632323887", "batch": "Morning"}, {"id": "fvc1044", "name": "Mahummed Arsh Waseem Attar", "father": "Waseem", "phone": "9113226931", "batch": "Morning"}, {"id": "fvc1045", "name": "Azmat Waseem Attar", "father": "Waseem", "phone": "9113226931", "batch": "Morning"}, {"id": "fvc1047", "name": "Ahmed raza", "father": "", "phone": "", "batch": "Morning"}, {"id": "fvc1049", "name": "Arhan Altaf savnoor", "father": "Altaf", "phone": "9164848348", "batch": "Morning"}, {"id": "fvc1050", "name": "Arman riyaz ahmed bepari", "father": "Riyas ahmed", "phone": "8123014652", "batch": "Morning"}, {"id": "fvc1052", "name": "muhammad Aalam", "father": "Nazeer sahab mulla", "phone": "9742414463", "batch": "Morning"}, {"id": "fvc1057", "name": "Toufiq Imamsahb Sheikh", "father": "Imamsahab", "phone": "8618947904", "batch": "Morning"}, {"id": "fvc1058", "name": "Arhan Muhammad Jamkhandi", "father": "Muhammad", "phone": "9980866830", "batch": "Morning"}, {"id": "fvc1061", "name": "Ayan malik Uchgaokar", "father": "Malik", "phone": "8951466827", "batch": "Morning"}, {"id": "fvc1062", "name": "Muhammad kaif baghban", "father": "Kamran", "phone": "9844550793", "batch": "Morning"}, {"id": "fvc1067", "name": "Ali Hasan mujawar", "father": "moinuddin", "phone": "9742662376", "batch": "Morning"}, {"id": "fvc1069", "name": "Umar farooq", "father": "Asfaq tadkor", "phone": "9945522821", "batch": "Morning"}, {"id": "fvc1070", "name": "Muhammad Saif badruddin sheikh", "father": "", "phone": "9886959131", "batch": "Morning"}, {"id": "fvc1071", "name": "Muhammad aleem naeem sayed", "father": "", "phone": "8050401790", "batch": "Morning"}, {"id": "fvc1072", "name": "Alihasan mujawar moinuddin mujawar", "father": "", "phone": "9742662376", "batch": "Morning"}, {"id": "fvc1073", "name": "Fizan asif yadwardkr", "father": "", "phone": "8951145884", "batch": "Morning"}, {"id": "fvc1074", "name": "Sayed adnan Jahangir inamdar", "father": "", "phone": "9844959936", "batch": "Morning"}];
+var GA = [{"id": "fvc1001", "name": "zain tapalwale", "father": "Samiulla tapalwale", "phone": "919880495513", "batch": "Morning"}, {"id": "fvc1002", "name": "Muhammad zaid. Nadeem maniyar.", "father": "", "phone": "8088031415", "batch": "Morning"}, {"id": "fvc1005", "name": "Hussain", "father": "", "phone": "8618667480", "batch": "Morning"}, {"id": "fvc1009", "name": "Abdullah ajaz yargatti", "father": "Ajaz. B.yargatti", "phone": "9108806771", "batch": "Morning"}, {"id": "fvc1012", "name": "Hussain Afsar Namakwale", "father": "Afsar Namakwale", "phone": "9945265748", "batch": "Morning"}, {"id": "fvc1013", "name": "Arhaan Imtiyaz Mulla", "father": "Imtiyaz Mulla", "phone": "9740425361", "batch": "Morning"}, {"id": "fvc1014", "name": "Mahammedfihaan Bepari", "father": "Qattalahmed Bepari", "phone": "9341966641", "batch": "Morning"}, {"id": "fvc1019", "name": "Mohammad Arkam Nalband", "father": "Juned nalband", "phone": "9964266783", "batch": "Morning"}, {"id": "fvc1020", "name": "HASNAIN Nalband", "father": "Juned nalband", "phone": "9964266783", "batch": "Morning"}, {"id": "fvc1023", "name": "Bilal salim hosmani", "father": "salim hosmani", "phone": "9980677605", "batch": "Morning"}, {"id": "fvc1024", "name": "husain salim hosmani", "father": "salim hosmani", "phone": "9980677605", "batch": "Morning"}, {"id": "fvc1031", "name": "Mohammad Noraiz Nazir Ahamed Tinwale", "father": "Nazir Ahamed", "phone": "9172990161", "batch": "Morning"}, {"id": "fvc1033", "name": "Ahmaz raza Gulzar sanadi", "father": "Gulzar sanadi", "phone": "7204417157", "batch": "Morning"}, {"id": "fvc1037", "name": "Arman Azhruddin Makandar", "father": "Azhruddin Makandar", "phone": "9035072170", "batch": "Morning"}, {"id": "fvc1038", "name": "sibtain makandar", "father": "asif makandar", "phone": "9900673978", "batch": "Morning"}, {"id": "fvc1040", "name": "Ali raza. A.sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "9743120350", "batch": "Morning"}, {"id": "fvc1051", "name": "Ahmed ashfaq Andewale", "father": "Ashfaq", "phone": "7816031500", "batch": "Morning"}, {"id": "fvc1053", "name": "Mahir ali", "father": "Toufiq", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1054", "name": "Muhammad hasnain Musa Gorikhan", "father": "musa Gorikhan", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1055", "name": "Muhammad mufeez", "father": "musa Gorikhan", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1056", "name": "Muhammad Mizan Hassan Sahab", "father": "Husain sahab", "phone": "7090511176", "batch": "Morning"}, {"id": "fvc1059", "name": "Mohammad zaid Nadeem maniyar", "father": "Nadeem maniyar", "phone": "9880093725", "batch": "Morning"}, {"id": "fvc1060", "name": "Arman Azriddin makandar", "father": "Azruddin", "phone": "7411402693", "batch": "Morning"}, {"id": "fvc1063", "name": "Muhammad mizan Husain sahab", "father": "Husain sahb", "phone": "9739695182", "batch": "Morning"}, {"id": "fvc1064", "name": "Bilal baig Todewale", "father": "Baig todewale", "phone": "8792213203", "batch": "Morning"}, {"id": "fvc1065", "name": "Mohammad ali", "father": "Zubair ahmed sandi", "phone": "9448125999", "batch": "Morning"}, {"id": "fvc1066", "name": "Abdullah Aijaz ahmed yargatti", "father": "Aijaz ahmed yargatti", "phone": "9036226949", "batch": "Morning"}, {"id": "fvc1068", "name": "Mohammad ali nangadkr", "father": "maqsood", "phone": "9739772828", "batch": "Morning"}];
 
-
-
-async function preloadStudents() {
-  // Always push on first open — no localStorage check
-  // so GitHub Pages refresh always gets fresh data
-
-  // Load deleted lists first
-  const deletedB = await $fb.get("vacationpro/deleted") || {};
-  const deletedA = await $fb.get("gradeA/deleted") || {};
-
-  // Push Grade B — skip deleted students
-  const existingB = await $fb.get("vacationpro/students") || {};
-  const mergedB = {...existingB};
-  GRADE_B_STUDENTS.forEach(s => {
-    if(!deletedB[s.id]) mergedB[s.id] = s; // only add if NOT deleted
+// ── BOOT ──────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", function(){
+  document.getElementById("loginbtn").addEventListener("click", doLogin);
+  document.getElementById("pinbox").addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
+  document.getElementById("logoutbtn").addEventListener("click", doLogout);
+  document.querySelectorAll(".nb").forEach(function(b){
+    var tab=b.id.replace("nb-","");
+    b.addEventListener("click", function(){ go(tab); });
   });
-  await $fb.set("vacationpro/students", mergedB);
-
-  // Push Grade A — skip deleted students
-  const existingA = await $fb.get("gradeA/students") || {};
-  const mergedA = {...existingA};
-  GRADE_A_STUDENTS.forEach(s => {
-    if(!deletedA[s.id]) mergedA[s.id] = s; // only add if NOT deleted
-  });
-  await $fb.set("gradeA/students", mergedA);
-
-  console.log('✅ Students synced to Firebase');
-  
-  // Now pull so UI updates immediately after push
-  await loadPhotos();
-  await pull();
-}
-
-// ═══════════════════════════════════════════════
-// 📥 PRELOADED STUDENTS FROM EXCEL
-// Grade B → Khan Sir (vacationpro path)
-// Grade A → Other Teachers (shared path)
-// ═══════════════════════════════════════════════
-const GRADE_B_STUDENTS = [{"id": "fvc1003", "name": "Muhammad arhan", "father": "", "phone": "9900454434", "batch": "Morning"}, {"id": "fvc1004", "name": "Sohail", "father": "", "phone": "7019664761", "batch": "Morning"}, {"id": "fvc1006", "name": "Nusayr", "father": "", "phone": "8147234661", "batch": "Morning"}, {"id": "fvc1007", "name": "Ziyan", "father": "", "phone": "9900803332", "batch": "Morning"}, {"id": "fvc1008", "name": "Muhammad mizan", "father": "", "phone": "7090511176", "batch": "Morning"}, {"id": "fvc1010", "name": "Abdulqadir.I.Sayyad", "father": "Irfanahmed .H.sayyad", "phone": "9036369080", "batch": "Morning"}, {"id": "fvc1011", "name": "AbdulRahman Junaid Mulla", "father": "Junaid A Mulla", "phone": "9900696064", "batch": "Morning"}, {"id": "fvc1015", "name": "Rehan Muzaffar Kureshi", "father": "", "phone": "7760077658", "batch": "Morning"}, {"id": "fvc1016", "name": "Mahammadgous Javeed Mujawar", "father": "Javeed", "phone": "7259748178", "batch": "Morning"}, {"id": "fvc1017", "name": "Muhammad Musab Javid Mulla", "father": "Javid Isak Mulla", "phone": "9743007373", "batch": "Morning"}, {"id": "fvc1018", "name": "Abbasali M Odekar", "father": "Moulali S Odekar", "phone": "8971426800", "batch": "Morning"}, {"id": "fvc1021", "name": "Ahmed kabir Bagewadi", "father": "Irfan Bagewadi", "phone": "9886226415", "batch": "Morning"}, {"id": "fvc1022", "name": "Anasraja Bagewadi", "father": "Irfan Bagewadi", "phone": "9886226415", "batch": "Morning"}, {"id": "fvc1025", "name": "Mohammad Kais khutbudin kalakoti", "father": "wasim g maniyar", "phone": "8550081712", "batch": "Morning"}, {"id": "fvc1026", "name": "Mohammad Saad khutbudin kalakoti", "father": "wasim g maniyar", "phone": "8550081712", "batch": "Morning"}, {"id": "fvc1027", "name": "Hussain wasim maniyar", "father": "wasim g maniyar", "phone": "8550081712", "batch": "Morning"}, {"id": "fvc1028", "name": "Mohammed ARZAAN", "father": "Nawaz Naikwadi", "phone": "9036538483", "batch": "Morning"}, {"id": "fvc1029", "name": "mufeez musa Gorikhan", "father": "musa", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1030", "name": "Mujahid shaikh", "father": "N", "phone": "8904665311", "batch": "Morning"}, {"id": "fvc1032", "name": "Rehab Amjad Shekh", "father": "Amjad", "phone": "9172990161", "batch": "Morning"}, {"id": "fvc1034", "name": "Mohammad Hushen Khoja", "father": "Yunus", "phone": "9591297217", "batch": "Morning"}, {"id": "fvc1035", "name": "Ayan MalikUchagaokar", "father": "Malik", "phone": "8951466827", "batch": "Morning"}, {"id": "fvc1036", "name": "Ziyan", "father": "Malikjaan. D. Tenginkeri", "phone": "9900803332", "batch": "Morning"}, {"id": "fvc1039", "name": "Mueez Abdul Rashid Patvegar", "father": "Abdul Rasheed A Patvegar", "phone": "8861229141", "batch": "Morning"}, {"id": "fvc1041", "name": "Almez A. Sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "9743120350", "batch": "Morning"}, {"id": "fvc1042", "name": "Alfan A. sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "9743120350", "batch": "Morning"}, {"id": "fvc1043", "name": "Zohair Ahmed Sameer Ahmed Pachapuri", "father": "Sameer Ahmed", "phone": "9632323887", "batch": "Morning"}, {"id": "fvc1044", "name": "Mahummed Arsh Waseem Attar", "father": "Waseem", "phone": "9113226931", "batch": "Morning"}, {"id": "fvc1045", "name": "Azmat Waseem Attar", "father": "Waseem", "phone": "9113226931", "batch": "Morning"}, {"id": "fvc1047", "name": "Ahmed raza", "father": "", "phone": "", "batch": "Morning"}, {"id": "fvc1049", "name": "Arhan Altaf savnoor", "father": "Altaf", "phone": "9164848348", "batch": "Morning"}, {"id": "fvc1050", "name": "Arman riyaz ahmed bepari", "father": "Riyas ahmed", "phone": "8123014652", "batch": "Morning"}, {"id": "fvc1052", "name": "muhammad Aalam", "father": "Nazeer sahab mulla", "phone": "9742414463", "batch": "Morning"}, {"id": "fvc1057", "name": "Toufiq Imamsahb Sheikh", "father": "Imamsahab", "phone": "8618947904", "batch": "Morning"}, {"id": "fvc1058", "name": "Arhan Muhammad Jamkhandi", "father": "Muhammad", "phone": "9980866830", "batch": "Morning"}, {"id": "fvc1061", "name": "Ayan malik Uchgaokar", "father": "Malik", "phone": "8951466827", "batch": "Morning"}, {"id": "fvc1062", "name": "Muhammad kaif baghban", "father": "Kamran", "phone": "9844550793", "batch": "Morning"}, {"id": "fvc1067", "name": "Ali Hasan mujawar", "father": "moinuddin", "phone": "9742662376", "batch": "Morning"}, {"id": "fvc1069", "name": "Umar farooq", "father": "Asfaq tadkor", "phone": "9945522821", "batch": "Morning"}, {"id": "fvc1070", "name": "Muhammad Saif badruddin sheikh", "father": "", "phone": "9886959131", "batch": "Morning"}, {"id": "fvc1071", "name": "Muhammad aleem naeem sayed", "father": "", "phone": "8050401790", "batch": "Morning"}, {"id": "fvc1072", "name": "Alihasan mujawar moinuddin mujawar", "father": "", "phone": "9742662376", "batch": "Morning"}, {"id": "fvc1073", "name": "Fizan asif yadwardkr", "father": "", "phone": "8951145884", "batch": "Morning"}, {"id": "fvc1074", "name": "Sayed adnan Jahangir inamdar", "father": "", "phone": "9844959936", "batch": "Morning"}];
-const GRADE_A_STUDENTS = [{"id": "fvc1001", "name": "zain tapalwale", "father": "Samiulla tapalwale", "phone": "919880495513", "batch": "Morning"}, {"id": "fvc1002", "name": "Muhammad zaid. Nadeem maniyar.", "father": "", "phone": "8088031415", "batch": "Morning"}, {"id": "fvc1005", "name": "Hussain", "father": "", "phone": "8618667480", "batch": "Morning"}, {"id": "fvc1009", "name": "Abdullah ajaz yargatti", "father": "Ajaz. B.yargatti", "phone": "9108806771", "batch": "Morning"}, {"id": "fvc1012", "name": "Hussain Afsar Namakwale", "father": "Afsar Namakwale", "phone": "9945265748", "batch": "Morning"}, {"id": "fvc1013", "name": "Arhaan Imtiyaz Mulla", "father": "Imtiyaz Mulla", "phone": "9740425361", "batch": "Morning"}, {"id": "fvc1014", "name": "Mahammedfihaan Bepari", "father": "Qattalahmed Bepari", "phone": "9341966641", "batch": "Morning"}, {"id": "fvc1019", "name": "Mohammad Arkam Nalband", "father": "Juned nalband", "phone": "9964266783", "batch": "Morning"}, {"id": "fvc1020", "name": "HASNAIN Nalband", "father": "Juned nalband", "phone": "9964266783", "batch": "Morning"}, {"id": "fvc1023", "name": "Bilal salim hosmani", "father": "salim hosmani", "phone": "9980677605", "batch": "Morning"}, {"id": "fvc1024", "name": "husain salim hosmani", "father": "salim hosmani", "phone": "9980677605", "batch": "Morning"}, {"id": "fvc1031", "name": "Mohammad Noraiz Nazir Ahamed Tinwale", "father": "Nazir Ahamed", "phone": "9172990161", "batch": "Morning"}, {"id": "fvc1033", "name": "Ahmaz raza Gulzar sanadi", "father": "Gulzar sanadi", "phone": "7204417157", "batch": "Morning"}, {"id": "fvc1037", "name": "Arman Azhruddin Makandar", "father": "Azhruddin Makandar", "phone": "9035072170", "batch": "Morning"}, {"id": "fvc1038", "name": "sibtain makandar", "father": "asif makandar", "phone": "9900673978", "batch": "Morning"}, {"id": "fvc1040", "name": "Ali raza. A.sayyed", "father": "Muhammad Arif D.Sayyed", "phone": "9743120350", "batch": "Morning"}, {"id": "fvc1051", "name": "Ahmed ashfaq Andewale", "father": "Ashfaq", "phone": "7816031500", "batch": "Morning"}, {"id": "fvc1053", "name": "Mahir ali", "father": "Toufiq", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1054", "name": "Muhammad hasnain Musa Gorikhan", "father": "musa Gorikhan", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1055", "name": "Muhammad mufeez", "father": "musa Gorikhan", "phone": "9632701593", "batch": "Morning"}, {"id": "fvc1056", "name": "Muhammad Mizan Hassan Sahab", "father": "Husain sahab", "phone": "7090511176", "batch": "Morning"}, {"id": "fvc1059", "name": "Mohammad zaid Nadeem maniyar", "father": "Nadeem maniyar", "phone": "9880093725", "batch": "Morning"}, {"id": "fvc1060", "name": "Arman Azriddin makandar", "father": "Azruddin", "phone": "7411402693", "batch": "Morning"}, {"id": "fvc1063", "name": "Muhammad mizan Husain sahab", "father": "Husain sahb", "phone": "9739695182", "batch": "Morning"}, {"id": "fvc1064", "name": "Bilal baig Todewale", "father": "Baig todewale", "phone": "8792213203", "batch": "Morning"}, {"id": "fvc1065", "name": "Mohammad ali", "father": "Zubair ahmed sandi", "phone": "9448125999", "batch": "Morning"}, {"id": "fvc1066", "name": "Abdullah Aijaz ahmed yargatti", "father": "Aijaz ahmed yargatti", "phone": "9036226949", "batch": "Morning"}, {"id": "fvc1068", "name": "Mohammad ali nangadkr", "father": "maqsood", "phone": "9739772828", "batch": "Morning"}]
+  buildLogin();
+});
+</script>
+</body>
+</html>
